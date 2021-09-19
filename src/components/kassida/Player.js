@@ -2,6 +2,7 @@
  * @flow
  */
 import React, {useCallback, useEffect, useState} from 'react';
+import {StyleSheet} from 'react-native';
 import Text from 'react-native-ui-lib/text';
 import View from 'react-native-ui-lib/view';
 import Card from 'react-native-ui-lib/card';
@@ -11,7 +12,6 @@ import TrackPlayer, {State} from 'react-native-track-player';
 
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
-import {StyleSheet} from 'react-native';
 import PlayerProgress from './PlayerProgress';
 
 type PlayerProps = {
