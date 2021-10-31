@@ -6,13 +6,95 @@
  * @flow
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import type {Node} from 'react';
 import TrackPlayer from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
 
-import FloatingLyrics from './src/components/kassida/FloatingLyrics';
-import Player from './src/components/kassida/Player';
+import SceneRenderer from './src/components/scenes/SceneRenderer';
+import {Picker} from '@react-native-picker/picker';
+import {Colors} from 'react-native-ui-lib';
+import {StyleSheet} from 'react-native';
+
+const scenes = [
+  {
+    key: 'PLAYER_ONLY',
+    name: 'Lecture Seule',
+    config: {
+      elements: [
+        {
+          key: 'PLAYER',
+          type: 'PLAYER',
+        },
+      ],
+    },
+  },
+  {
+    key: 'AR_FR_TRANSCRIPTION',
+    name: 'Transcription Arabe/Français',
+    config: {
+      elements: [
+        {
+          key: 'FLOATING_LYRICS_FR',
+          type: 'FLOATING_LYRICS',
+          props: {
+            lang: 'fr',
+          },
+        },
+        {
+          key: 'FLOATING_LYRICS_AR',
+          type: 'FLOATING_LYRICS',
+          props: {
+            lang: 'ar',
+          },
+        },
+        {
+          key: 'PLAYER',
+          type: 'PLAYER',
+        },
+      ],
+    },
+  },
+  {
+    key: 'AR_TRANSCRIPTION',
+    name: 'Transcription Arabe',
+    config: {
+      elements: [
+        {
+          key: 'FLOATING_LYRICS_AR',
+          type: 'FLOATING_LYRICS',
+          props: {
+            lang: 'ar',
+          },
+        },
+        {
+          key: 'PLAYER',
+          type: 'PLAYER',
+        },
+      ],
+    },
+  },
+  {
+    key: 'FR_TRANSCRIPTION',
+    name: 'Transcription Français',
+    config: {
+      elements: [
+        {
+          key: 'FLOATING_LYRICS_FR',
+          type: 'FLOATING_LYRICS',
+          props: {
+            lang: 'fr',
+          },
+        },
+        {
+          key: 'PLAYER',
+          type: 'PLAYER',
+        },
+      ],
+    },
+  },
+];
+
 const kassida = require('./src/fixtures/kassida.json');
 var track = {
   url: kassida.variants[0].audio.url,
@@ -29,15 +111,35 @@ TrackPlayer.setupPlayer({})
   .catch(console.error);
 
 const App: () => Node = () => {
+  const [selectedScene, setSelectedScene] = useState(scenes[1]);
   return (
     <View flex>
-      <View flex backgroundColor="white" padding-10 spread>
-        <FloatingLyrics kassida={kassida} variantIndex={0} lang="fr" />
-        <FloatingLyrics kassida={kassida} variantIndex={0} lang="ar" />
-        <Player kassida={kassida} variantIndex={0} />
-      </View>
+      <Picker
+        placeholder="Scène"
+        selectedValue={selectedScene.key}
+        onValueChange={sceneKey =>
+          setSelectedScene(scenes.find(scene => scene.key === sceneKey))
+        }
+        style={styles.scenePicker}
+        dropdownIconColor={Colors.primary}>
+        {scenes.map(scene => (
+          <Picker.Item key={scene.key} value={scene.key} label={scene.name} />
+        ))}
+      </Picker>
+      <SceneRenderer
+        kassida={kassida}
+        variantIndex={0}
+        sceneConfig={selectedScene.config}
+      />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  scenePicker: {
+    backgroundColor: Colors.white,
+  },
+  scenePickerItem: {},
+});
 
 export default App;
