@@ -3,9 +3,9 @@
  */
 
 export type TranslatedString = {
-  fr: string,
-  en: string,
-  ar: string,
-  frSN: string,
-  arSN: string,
+  fr?: string,
+  en?: string,
+  ar?: string,
+  frSN?: string,
+  arSN?: string,
 };

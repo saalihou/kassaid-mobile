@@ -33,9 +33,8 @@ const App: () => Node = () => {
   return (
     <View flex>
       <View flex backgroundColor="white" padding-10 spread>
-        <Card enableShadow elevation={20} padding-20>
-          <FloatingLyrics kassida={kassida} variantIndex={0} />
-        </Card>
+        <FloatingLyrics kassida={kassida} variantIndex={0} lang="fr" />
+        <FloatingLyrics kassida={kassida} variantIndex={0} lang="ar" />
         <Player kassida={kassida} variantIndex={0} />
       </View>
     </View>

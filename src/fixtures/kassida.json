@@ -4,7 +4,8 @@
     "ar": "مدالخبير"
   },
   "content": {
-    "fr": "Le Connaisseur et le Grand m'a donné\nDes dons qui ne finissent jamais\nL'élu de mon Seigneur est mon ami et mon aimé avec qui mon plaisir s'est purifié\nIl a dissipé mon orgueil,\nil a guidé mon égarement\nCelui qui accroît sans fin ma fortune licite\nChanter l'éloge de guide\nest mon choix dans ma vie\nIl m'a purifié sans aucune peine\nMes relations sont restées avec lui\nlà ou je me trouve dans mon terroir sans isolement (exil)\net sans la moindre fatigue\nMes reconnaissances s'adressent au Prophète d'Allah\ndétenteur de tout éloge mérite\nVers le pieux, brave comme lion contre le désamparé\nje lance mon appel à celui qui est la porte d'élevation\nMon coeur ne cesse de m'appeler vers la perte, ou vers la perte\nle mal ou l'austère\nLe meilleur des esclaves (Mouhammed) votre devance est évidente\nPar tes qualités à suivre\nTu as la pureté, de toi émane les dots\nTu seras au devant le jour de la dissimulation\nO Toi qui guide toutes les troupes sans aucune peine\nVers Celui qui accepte la repentance, c'est de toi qu'émane ma guérison"
+    "fr": "Le Connaisseur et le Grand m'a donné\nDes dons qui ne finissent jamais\nL'élu de mon Seigneur est mon ami et mon aimé avec qui mon plaisir s'est purifié\nIl a dissipé mon orgueil,\nil a guidé mon égarement\nCelui qui accroît sans fin ma fortune licite\nChanter l'éloge de guide\nest mon choix dans ma vie\nIl m'a purifié sans aucune peine\nMes relations sont restées avec lui\nlà ou je me trouve dans mon terroir sans isolement (exil)\net sans la moindre fatigue\nMes reconnaissances s'adressent au Prophète d'Allah\ndétenteur de tout éloge mérite\nVers le pieux, brave comme lion contre le désamparé\nje lance mon appel à celui qui est la porte d'élevation\nMon coeur ne cesse de m'appeler vers la perte, ou vers la perte\nle mal ou l'austère\nLe meilleur des esclaves (Mouhammed) votre devance est évidente\nPar tes qualités à suivre\nTu as la pureté, de toi émane les dots\nTu seras au devant le jour de la dissimulation\nO Toi qui guide toutes les troupes sans aucune peine\nVers Celui qui accepte la repentance, c'est de toi qu'émane ma guérison\n",
+    "ar": "مدّالخبير ل ولكبير\nملا يبور من اللها ء\n"
   },
   "variants": [
     {
@@ -20,48 +21,140 @@
       "duration": 477,
       "transcriptionSegments": [
         {
-          "timestamp": {"start": 0, "end": 46},
-          "contentRef": {"fr": {"start": 0, "end": 68}}
+          "timestamp": {
+            "start": 0,
+            "end": 46
+          },
+          "contentRef": {
+            "fr": {
+              "start": 0,
+              "end": 69
+            },
+            "ar": {
+              "start": 0,
+              "end": 37
+            }
+          }
         },
         {
-          "timestamp": {"start": 47, "end": 62},
-          "contentRef": {"fr": {"start": 70, "end": 149}}
+          "timestamp": {
+            "start": 47,
+            "end": 62
+          },
+          "contentRef": {
+            "fr": {
+              "start": 70,
+              "end": 149
+            }
+          }
         },
         {
-          "timestamp": {"start": 63, "end": 78},
-          "contentRef": {"fr": {"start": 151, "end": 245}}
+          "timestamp": {
+            "start": 63,
+            "end": 78
+          },
+          "contentRef": {
+            "fr": {
+              "start": 151,
+              "end": 245
+            }
+          }
         },
         {
-          "timestamp": {"start": 79, "end": 95},
-          "contentRef": {"fr": {"start": 247, "end": 329}}
+          "timestamp": {
+            "start": 79,
+            "end": 95
+          },
+          "contentRef": {
+            "fr": {
+              "start": 247,
+              "end": 329
+            }
+          }
         },
         {
-          "timestamp": {"start": 94, "end": 112},
-          "contentRef": {"fr": {"start": 331, "end": 450}}
+          "timestamp": {
+            "start": 94,
+            "end": 112
+          },
+          "contentRef": {
+            "fr": {
+              "start": 331,
+              "end": 450
+            }
+          }
         },
         {
-          "timestamp": {"start": 113, "end": 128},
-          "contentRef": {"fr": {"start": 452, "end": 533}}
+          "timestamp": {
+            "start": 113,
+            "end": 128
+          },
+          "contentRef": {
+            "fr": {
+              "start": 452,
+              "end": 533
+            }
+          }
         },
         {
-          "timestamp": {"start": 129, "end": 144},
-          "contentRef": {"fr": {"start": 535, "end": 641}}
+          "timestamp": {
+            "start": 129,
+            "end": 144
+          },
+          "contentRef": {
+            "fr": {
+              "start": 535,
+              "end": 641
+            }
+          }
         },
         {
-          "timestamp": {"start": 145, "end": 160},
-          "contentRef": {"fr": {"start": 643, "end": 725}}
+          "timestamp": {
+            "start": 145,
+            "end": 160
+          },
+          "contentRef": {
+            "fr": {
+              "start": 643,
+              "end": 725
+            }
+          }
         },
         {
-          "timestamp": {"start": 161, "end": 177},
-          "contentRef": {"fr": {"start": 727, "end": 815}}
+          "timestamp": {
+            "start": 161,
+            "end": 177
+          },
+          "contentRef": {
+            "fr": {
+              "start": 727,
+              "end": 815
+            }
+          }
         },
         {
-          "timestamp": {"start": 178, "end": 193},
-          "contentRef": {"fr": {"start": 817, "end": 901}}
+          "timestamp": {
+            "start": 178,
+            "end": 193
+          },
+          "contentRef": {
+            "fr": {
+              "start": 817,
+              "end": 901
+            }
+          }
         },
         {
-          "timestamp": {"start": 194, "end": 210},
-          "contentRef": {"fr": {"start": 903, "end": 1026}}
+          "timestamp": {
+            "start": 194,
+            "end": 210
+          },
+          "contentRef": {
+            "fr": {
+              "start": 903,
+              "end": 1026
+            }
+          }
         }
       ]
     }

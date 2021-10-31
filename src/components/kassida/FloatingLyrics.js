@@ -3,12 +3,11 @@
  */
 import React, {useMemo} from 'react';
 import {useProgress} from 'react-native-track-player';
-import Text from 'react-native-ui-lib/text';
 import View from 'react-native-ui-lib/view';
 import Button from 'react-native-ui-lib/button';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {StyleSheet} from 'react-native';
-import {Colors} from 'react-native-ui-lib';
+import {Card, Text, Colors} from 'react-native-ui-lib';
 import TrackPlayer from 'react-native-track-player';
 
 import type {Kassida} from '../../types/kassida/Kassida';
@@ -18,6 +17,14 @@ type FloatingLyricsProps = {
   kassida: Kassida,
   variantIndex: number,
   lang?: Locale,
+};
+
+const localeLabels = {
+  fr: 'Français',
+  ar: 'عرب',
+  en: 'English',
+  frSN: 'Wolof',
+  arSN: 'ولوف',
 };
 
 const FloatingLyrics = ({
@@ -39,12 +46,13 @@ const FloatingLyrics = ({
     [kassidaVariant],
   );
   const currentSegment = secondsToSegmentMap[Math.round(progress.position)];
-  const segmentContent = currentSegment
-    ? kassida.content[lang].slice(
-        currentSegment.contentRef[lang].start,
-        currentSegment.contentRef[lang].end + 1,
-      )
-    : 'Pas de transcription disponible';
+  const segmentContent =
+    currentSegment && kassida.content[lang] && currentSegment.contentRef[lang]
+      ? kassida.content[lang].slice(
+          currentSegment.contentRef[lang].start,
+          currentSegment.contentRef[lang].end + 1,
+        )
+      : 'Pas de transcription disponible';
 
   const goToPreviousSegment = () => {
     const currentSegmentIndex =
@@ -79,27 +87,33 @@ const FloatingLyrics = ({
   };
 
   return (
-    <View style={styles.floatingLyrics} row center>
-      <Button round onPress={goToPreviousSegment}>
-        <Icon name="fast-rewind" color={Colors.white} />
-      </Button>
-      <Text center text30 style={styles.lyricsContent}>
-        {segmentContent}
+    <Card enableShadow elevation={20} padding-20 marginB-20>
+      <View style={styles.floatingLyrics} row center>
+        <Button round outline onPress={goToPreviousSegment}>
+          <Icon name="fast-rewind" color={Colors.primary} />
+        </Button>
+        <Text center text30 style={styles.lyricsContent}>
+          {segmentContent}
+        </Text>
+        <Button round outline onPress={goToNextSegment}>
+          <Icon name="fast-forward" color={Colors.primary} />
+        </Button>
+      </View>
+      <Text text80BL grey50>
+        {localeLabels[lang]}
       </Text>
-      <Button round onPress={goToNextSegment}>
-        <Icon name="fast-forward" color={Colors.white} />
-      </Button>
-    </View>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   floatingLyrics: {
     justifyContent: 'center',
-    height: 400,
+    height: 200,
   },
   lyricsContent: {
     width: '90%',
+    fontSize: 20,
   },
 });
 

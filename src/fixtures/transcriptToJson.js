@@ -1,15 +1,11 @@
 const fs = require('fs');
-const {flatten} = require('lodash');
+const {flatten, fromPairs} = require('lodash');
 
 const transcriptContent = fs.readFileSync(process.argv[2], 'utf8').trim();
 
 const segmentStrings = transcriptContent.split('\n\n');
 
-const content = flatten(
-  segmentStrings.map(segmentString => segmentString.split('\n').slice(2)),
-)
-  .map(line => line.trim())
-  .join('\n');
+const content = {};
 
 const timeStringToSeconds = timeString => {
   const parts = timeString.split(':');
@@ -29,18 +25,20 @@ const transcriptions = segmentStrings.map(segmentString => {
     end: timeStringToSeconds(endString),
   };
 
-  const contentString = segmentString
-    .split('\n')
-    .slice(2)
-    .map(line => line.trim())
-    .join('\n');
+  const contentRef = {};
 
-  const locale = segmentString.split('\n')[1].trim();
-  const contentRef = {
-    locale,
-    start: content.indexOf(contentString),
-    end: content.indexOf(contentString) + contentString.length - 1,
-  };
+  let transcriptionMatch;
+  const transcriptionRegex = /\[([a-zA-Z]+)\]\n([^[]+)/g;
+  while ((transcriptionMatch = transcriptionRegex.exec(segmentString))) {
+    const locale = transcriptionMatch[1];
+    const subContent = transcriptionMatch[2];
+
+    content[locale] = ((content[locale] || '') + subContent).trim() + '\n';
+    contentRef[locale] = {
+      start: content[locale].indexOf(subContent),
+      end: content[locale].indexOf(subContent) + subContent.length - 1,
+    };
+  }
 
   return {
     timestamp,
@@ -49,8 +47,12 @@ const transcriptions = segmentStrings.map(segmentString => {
 });
 
 console.log(
-  JSON.stringify({
-    content,
-    transcriptions,
-  }),
+  JSON.stringify(
+    {
+      content,
+      transcriptions,
+    },
+    null,
+    2,
+  ),
 );
