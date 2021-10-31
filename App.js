@@ -12,7 +12,6 @@ import TrackPlayer from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
 
 import FloatingLyrics from './src/components/kassida/FloatingLyrics';
-import Card from 'react-native-ui-lib/card';
 import Player from './src/components/kassida/Player';
 const kassida = require('./src/fixtures/kassida.json');
 var track = {
