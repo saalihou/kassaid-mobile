@@ -8,7 +8,7 @@
 
 import React, {useState} from 'react';
 import type {Node} from 'react';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer, {Capability} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
 
 import SceneRenderer from './src/components/scenes/SceneRenderer';
@@ -56,6 +56,51 @@ const scenes = [
     },
   },
   {
+    key: 'AR_EN_TRANSCRIPTION',
+    name: 'Transcription Arabic/English',
+    config: {
+      elements: [
+        {
+          key: 'FLOATING_LYRICS_EN',
+          type: 'FLOATING_LYRICS',
+          props: {
+            lang: 'en',
+          },
+        },
+        {
+          key: 'FLOATING_LYRICS_AR',
+          type: 'FLOATING_LYRICS',
+          props: {
+            lang: 'ar',
+          },
+        },
+        {
+          key: 'PLAYER',
+          type: 'PLAYER',
+        },
+      ],
+    },
+  },
+  {
+    key: 'FRSN_TRANSCRIPTION',
+    name: 'Transcription Wolof',
+    config: {
+      elements: [
+        {
+          key: 'FLOATING_LYRICS_FRSN',
+          type: 'FLOATING_LYRICS',
+          props: {
+            lang: 'frSN',
+          },
+        },
+        {
+          key: 'PLAYER',
+          type: 'PLAYER',
+        },
+      ],
+    },
+  },
+  {
     key: 'AR_TRANSCRIPTION',
     name: 'Transcription Arabe',
     config: {
@@ -74,31 +119,12 @@ const scenes = [
       ],
     },
   },
-  {
-    key: 'FR_TRANSCRIPTION',
-    name: 'Transcription Français',
-    config: {
-      elements: [
-        {
-          key: 'FLOATING_LYRICS_FR',
-          type: 'FLOATING_LYRICS',
-          props: {
-            lang: 'fr',
-          },
-        },
-        {
-          key: 'PLAYER',
-          type: 'PLAYER',
-        },
-      ],
-    },
-  },
 ];
 
 const kassida = require('./src/fixtures/kassida.json');
-var track = {
+const track = {
   url: kassida.variants[0].audio.url,
-  title: kassida.name,
+  title: kassida.name.fr,
   artist: 'Cheikh Ahmadou Bamba',
   artwork: kassida.variants[0].preview.url,
   duration: 477, // Duration in seconds
@@ -109,6 +135,18 @@ TrackPlayer.setupPlayer({})
     TrackPlayer.add(track);
   })
   .catch(console.error);
+
+TrackPlayer.updateOptions({
+  stopWithApp: true,
+  capabilities: [
+    Capability.Play,
+    Capability.Pause,
+    Capability.SkipToNext,
+    Capability.SkipToPrevious,
+    Capability.Stop,
+  ],
+  compactCapabilities: [Capability.Play, Capability.Pause],
+});
 
 const App: () => Node = () => {
   const [selectedScene, setSelectedScene] = useState(scenes[1]);
