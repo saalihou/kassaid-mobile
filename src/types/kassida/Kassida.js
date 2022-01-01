@@ -20,15 +20,19 @@ type KasidaVariant = {
     url: string,
   },
   duration: number,
-  transcriptionSegments: [TranscriptionSegment],
+  transcriptionSegments: {
+    fr?: Array<TranscriptionSegment>,
+    ar?: Array<TranscriptionSegment>,
+    en?: Array<TranscriptionSegment>,
+    frSN?: Array<TranscriptionSegment>,
+    arSN?: Array<TranscriptionSegment>,
+  },
 };
 
 type TranscriptionSegment = {
   contentRef: {
-    [Locale]: {
-      start: number,
-      end: number,
-    },
+    start: number,
+    end: number,
   },
   timestamp: {
     start: number,

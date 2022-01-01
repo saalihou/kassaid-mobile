@@ -12,7 +12,7 @@ import Player from '../kassida/Player';
 export type SceneElementType = 'FLOATING_LYRICS' | 'PLAYER';
 
 type SceneElement = {
-  key: String,
+  key: string,
   type: SceneElementType,
   props: Object,
 };

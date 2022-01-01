@@ -1,11 +1,7 @@
 const fs = require('fs');
-const {flatten, fromPairs} = require('lodash');
-
 const transcriptContent = fs.readFileSync(process.argv[2], 'utf8').trim();
 
-const segmentStrings = transcriptContent.split('\n\n');
-
-const content = {};
+const segmentStrings = transcriptContent.split('\n');
 
 const timeStringToSeconds = timeString => {
   const parts = timeString.split(':');
@@ -15,44 +11,30 @@ const timeStringToSeconds = timeString => {
   return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
 };
 
-const transcriptions = segmentStrings.map(segmentString => {
-  const timestampString = segmentString.split('\n')[0];
-  const startString = timestampString.split(',')[0];
-  const endString = timestampString.split(',')[1];
+const transcriptionSegments = segmentStrings
+  .map(segmentString => {
+    if (!segmentString) {
+      return null;
+    }
+    const transcriptionParts = /(\d+:\d+),(\d+:\d+) (\d+),(\d+)/.exec(
+      segmentString,
+    );
 
-  const timestamp = {
-    start: timeStringToSeconds(startString),
-    end: timeStringToSeconds(endString),
-  };
+    if (!transcriptionParts) {
+      throw new Error('Wrong format for segment string ' + segmentString);
+    }
 
-  const contentRef = {};
-
-  let transcriptionMatch;
-  const transcriptionRegex = /\[([a-zA-Z]+)\]\n([^[]+)/g;
-  while ((transcriptionMatch = transcriptionRegex.exec(segmentString))) {
-    const locale = transcriptionMatch[1];
-    const subContent = transcriptionMatch[2];
-
-    content[locale] = ((content[locale] || '') + subContent).trim() + '\n';
-    contentRef[locale] = {
-      start: content[locale].indexOf(subContent),
-      end: content[locale].indexOf(subContent) + subContent.length - 1,
+    return {
+      timestamp: {
+        start: timeStringToSeconds(transcriptionParts[1]),
+        end: timeStringToSeconds(transcriptionParts[2]),
+      },
+      contentRef: {
+        start: parseInt(timeStringToSeconds(transcriptionParts[3]), 10),
+        end: parseInt(timeStringToSeconds(transcriptionParts[4]), 10),
+      },
     };
-  }
+  })
+  .filter(v => !!v);
 
-  return {
-    timestamp,
-    contentRef,
-  };
-});
-
-console.log(
-  JSON.stringify(
-    {
-      content,
-      transcriptions,
-    },
-    null,
-    2,
-  ),
-);
+console.log(JSON.stringify(transcriptionSegments, null, 2));
