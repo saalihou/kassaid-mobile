@@ -109,11 +109,11 @@ const FloatingLyrics = ({
 const styles = StyleSheet.create({
   floatingLyrics: {
     justifyContent: 'center',
-    height: 200,
+    height: 150,
   },
   lyricsContent: {
     width: '90%',
-    fontSize: 20,
+    fontSize: 18,
   },
 });
 
