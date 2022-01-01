@@ -14,7 +14,7 @@ export type SceneElementType = 'FLOATING_LYRICS' | 'PLAYER';
 type SceneElement = {
   key: string,
   type: SceneElementType,
-  props: Object,
+  props?: Object,
 };
 
 type SceneConfig = {
@@ -43,7 +43,7 @@ const SceneRenderer = ({kassida, variantIndex, sceneConfig}: SceneProps) => {
               key={element.key}
               kassida={kassida}
               variantIndex={0}
-              lang={element.props.lang}
+              lang={element.props ? element.props.lang : 'fr'}
             />
           );
         }

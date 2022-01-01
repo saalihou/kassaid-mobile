@@ -117,9 +117,12 @@ const App: () => Node = () => {
       <Picker
         placeholder="Scène"
         selectedValue={selectedScene.key}
-        onValueChange={sceneKey =>
-          setSelectedScene(scenes.find(scene => scene.key === sceneKey))
-        }
+        onValueChange={sceneKey => {
+          const pickedScene = scenes.find(scene => scene.key === sceneKey);
+          if (pickedScene) {
+            setSelectedScene(pickedScene);
+          }
+        }}
         style={styles.scenePicker}
         dropdownIconColor={Colors.primary}>
         {scenes.map(scene => (

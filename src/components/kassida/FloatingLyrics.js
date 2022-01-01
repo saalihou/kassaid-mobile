@@ -1,17 +1,18 @@
 /**
  * @flow
  */
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useProgress} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
 import Button from 'react-native-ui-lib/button';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {StyleSheet} from 'react-native';
-import {Card, Text, Colors} from 'react-native-ui-lib';
+import {Card, Text, Colors, Dialog} from 'react-native-ui-lib';
 import TrackPlayer from 'react-native-track-player';
 
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
+import Reader from './Reader';
 
 type FloatingLyricsProps = {
   kassida: Kassida,
@@ -32,62 +33,79 @@ const FloatingLyrics = ({
   variantIndex,
   lang = 'fr',
 }: FloatingLyricsProps) => {
+  const [expanded, setExpanded] = useState(false);
   const kassidaVariant = kassida.variants[variantIndex];
   const progress = useProgress(1000);
-  const secondsToSegmentMap = useMemo(
+
+  const transcriptionSegments = kassidaVariant.transcriptionSegments[lang];
+
+  const secondsToSegmentIndexer = useMemo(
     () =>
-      [...new Array(kassidaVariant.duration)].map((_, second) =>
-        kassidaVariant.transcriptionSegments.find(
-          segment =>
-            second >= segment.timestamp.start &&
-            second <= segment.timestamp.end,
-        ),
-      ),
-    [kassidaVariant],
+      transcriptionSegments
+        ? [...new Array(kassidaVariant.duration)].map((_, second) =>
+            transcriptionSegments.find(
+              segment =>
+                second >= segment.timestamp.start &&
+                second <= segment.timestamp.end,
+            ),
+          )
+        : null,
+    [transcriptionSegments, kassidaVariant],
   );
-  const currentSegment = secondsToSegmentMap[Math.round(progress.position)];
+
+  if (!transcriptionSegments || !secondsToSegmentIndexer) {
+    return null;
+  }
+
+  const currentSegment = secondsToSegmentIndexer[Math.round(progress.position)];
   const segmentContent =
-    currentSegment && kassida.content[lang] && currentSegment.contentRef[lang]
-      ? kassida.content[lang].slice(
-          currentSegment.contentRef[lang].start,
-          currentSegment.contentRef[lang].end + 1,
-        )
+    currentSegment && kassida.content[lang] && currentSegment.contentRef
+      ? kassida.content[lang]
+          .split('\n')
+          .slice(
+            // Start and end lines are indexed from 1
+            currentSegment.contentRef.start - 1,
+            currentSegment.contentRef.end,
+          )
+          .join('\n')
       : 'Pas de transcription disponible';
 
   const goToPreviousSegment = () => {
-    const currentSegmentIndex =
-      kassidaVariant.transcriptionSegments.indexOf(currentSegment);
+    const currentSegmentIndex = transcriptionSegments.indexOf(currentSegment);
     const previousSegmentIndex =
       currentSegmentIndex === 0
         ? 0
         : currentSegmentIndex === -1
-        ? kassidaVariant.transcriptionSegments.length - 1
+        ? transcriptionSegments.length - 1
         : currentSegmentIndex - 1;
-    const previousSegment =
-      kassidaVariant.transcriptionSegments[previousSegmentIndex];
+    const previousSegment = transcriptionSegments[previousSegmentIndex];
     if (previousSegment) {
       TrackPlayer.seekTo(previousSegment.timestamp.start);
     }
   };
 
   const goToNextSegment = () => {
-    const currentSegmentIndex =
-      kassidaVariant.transcriptionSegments.indexOf(currentSegment);
+    const currentSegmentIndex = transcriptionSegments.indexOf(currentSegment);
     if (
       currentSegmentIndex === -1 ||
-      currentSegmentIndex === kassidaVariant.transcriptionSegments.length - 1
+      currentSegmentIndex === transcriptionSegments.length - 1
     ) {
       return;
     }
     const nextSegmentIndex = currentSegmentIndex + 1;
-    const nextSegment = kassidaVariant.transcriptionSegments[nextSegmentIndex];
+    const nextSegment = transcriptionSegments[nextSegmentIndex];
     if (nextSegment) {
       TrackPlayer.seekTo(nextSegment.timestamp.start);
     }
   };
 
   return (
-    <Card enableShadow elevation={20} padding-20 marginB-20>
+    <Card
+      enableShadow
+      elevation={20}
+      padding-20
+      marginB-20
+      onPress={() => setExpanded(true)}>
       <View style={styles.floatingLyrics} row center>
         <Button round outline onPress={goToPreviousSegment}>
           <Icon name="fast-rewind" color={Colors.primary} />
@@ -102,6 +120,9 @@ const FloatingLyrics = ({
       <Text text80BL grey50>
         {localeLabels[lang]}
       </Text>
+      <Dialog visible={expanded} onDismiss={() => setExpanded(false)}>
+        <Reader kassida={kassida} lang={lang} />
+      </Dialog>
     </Card>
   );
 };
@@ -113,7 +134,7 @@ const styles = StyleSheet.create({
   },
   lyricsContent: {
     width: '90%',
-    fontSize: 18,
+    fontSize: 16,
   },
 });
 
