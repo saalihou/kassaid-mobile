@@ -123,7 +123,12 @@ const App: () => Node = () => {
         style={styles.scenePicker}
         dropdownIconColor={Colors.primary}>
         {scenes.map(scene => (
-          <Picker.Item key={scene.key} value={scene.key} label={scene.name} />
+          <Picker.Item
+            style={styles.scenePickerItem}
+            key={scene.key}
+            value={scene.key}
+            label={scene.name}
+          />
         ))}
       </Picker>
       <SceneRenderer
@@ -139,7 +144,9 @@ const styles = StyleSheet.create({
   scenePicker: {
     backgroundColor: Colors.white,
   },
-  scenePickerItem: {},
+  scenePickerItem: {
+    color: Colors.black,
+  },
 });
 
 export default App;
