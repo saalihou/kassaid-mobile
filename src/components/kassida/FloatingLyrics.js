@@ -14,7 +14,7 @@ import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import Reader from './Reader';
 
-type FloatingLyricsProps = {
+export type FloatingLyricsProps = {
   kassida: Kassida,
   variantIndex: number,
   lang?: Locale,
@@ -29,11 +29,11 @@ const localeLabels = {
 };
 
 const fontSizePerLocale = {
-  fr: 15,
-  en: 15,
-  ar: 20,
-  arSN: 20,
-  frSN: 15,
+  fr: 18,
+  en: 18,
+  ar: 26,
+  arSN: 26,
+  frSN: 18,
 };
 
 const FloatingLyrics = ({
@@ -123,7 +123,10 @@ const FloatingLyrics = ({
           text30
           style={[
             styles.lyricsContent,
-            {fontSize: fontSizePerLocale[lang] || 16},
+            {
+              fontSize: fontSizePerLocale[lang] || 16,
+              lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
+            },
           ]}>
           {segmentContent}
         </Text>

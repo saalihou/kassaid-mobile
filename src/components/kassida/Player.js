@@ -13,13 +13,15 @@ import TrackPlayer, {State} from 'react-native-track-player';
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import PlayerProgress from './PlayerProgress';
+import {Colors, TouchableOpacity} from 'react-native-ui-lib';
 
-type PlayerProps = {
+export type PlayerProps = {
   kassida: Kassida,
   variantIndex: number,
   lang?: Locale,
   onPlay?: () => void,
   onPause?: () => void,
+  onNamePress: () => void,
 };
 
 const Player = ({
@@ -28,6 +30,7 @@ const Player = ({
   lang = 'fr',
   onPause,
   onPlay,
+  onNamePress,
 }: PlayerProps) => {
   const variant = kassida.variants[variantIndex];
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,6 +51,14 @@ const Player = ({
     }
   }, [isPlaying, onPause, onPlay]);
 
+  const previous = () => {
+    TrackPlayer.skipToPrevious();
+  };
+
+  const next = () => {
+    TrackPlayer.skipToNext();
+  };
+
   useEffect(() => {
     async function syncInitialIsPlaying() {
       const state = await TrackPlayer.getState();
@@ -67,19 +78,29 @@ const Player = ({
         imageStyle={styles.cardImage}
       />
       <View centerH flex spread paddingV-5>
-        <Text center text50>
-          {kassida.name[lang]}
-        </Text>
+        <TouchableOpacity onPress={onNamePress}>
+          <Text center text50>
+            {kassida.name[lang]}
+          </Text>
+        </TouchableOpacity>
         <Text center text90T>
           {variant.name[lang]}
         </Text>
-        <Button onPress={playPause}>
-          <Icon
-            name={isPlaying ? 'pause' : 'play-arrow'}
-            size={20}
-            color="white"
-          />
-        </Button>
+        <View row style={styles.buttonsContainer}>
+          <Button outline size="xSmall" onPress={previous}>
+            <Icon name={'skip-previous'} size={16} color={Colors.primary} />
+          </Button>
+          <Button onPress={playPause}>
+            <Icon
+              name={isPlaying ? 'pause' : 'play-arrow'}
+              size={20}
+              color="white"
+            />
+          </Button>
+          <Button outline size="xSmall" onPress={next}>
+            <Icon name={'skip-next'} size={20} color={Colors.primary} />
+          </Button>
+        </View>
         <View style={styles.progressContainer}>
           <PlayerProgress />
         </View>
@@ -89,10 +110,14 @@ const Player = ({
 };
 
 const styles = StyleSheet.create({
-  cardImage: {width: 150, height: 150, resizeMode: 'cover'},
+  cardImage: {width: 100, height: 100, resizeMode: 'cover'},
   progressContainer: {
     alignSelf: 'stretch',
     alignItems: 'stretch',
+  },
+  buttonsContainer: {
+    justifyContent: 'space-around',
+    alignSelf: 'stretch',
   },
 });
 

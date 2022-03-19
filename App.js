@@ -6,17 +6,25 @@
  * @flow
  */
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import type {Node} from 'react';
-import TrackPlayer, {Capability} from 'react-native-track-player';
+import TrackPlayer, {Capability, Event} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
 
 import SceneRenderer from './src/components/scenes/SceneRenderer';
+import type {SceneConfig} from './src/components/scenes/SceneRenderer';
 import {Picker} from '@react-native-picker/picker';
-import {Colors} from 'react-native-ui-lib';
+import {Colors, Dialog} from 'react-native-ui-lib';
 import {StyleSheet} from 'react-native';
+import KassidaSelector from './src/components/kassida/KassidaSelector';
 
-const scenes = [
+type Scene = {
+  key: string,
+  name: string,
+  config: SceneConfig,
+};
+
+const scenes: Scene[] = [
   {
     key: 'PLAYER_ONLY',
     name: 'Lecture Seule',
@@ -121,18 +129,21 @@ const scenes = [
   },
 ];
 
-const kassida = require('./src/fixtures/kassida.json');
-const track = {
+const kassidas = [
+  require('./src/fixtures/madalkhabirou.json'),
+  require('./src/fixtures/matlabouchifai.json'),
+];
+const tracks = kassidas.map(kassida => ({
   url: kassida.variants[0].audio.url,
   title: kassida.name.fr,
   artist: 'Cheikh Ahmadou Bamba',
   artwork: kassida.variants[0].preview.url,
-  duration: 477, // Duration in seconds
-};
+  duration: kassida.variants[0].duration, // Duration in seconds
+}));
 
 TrackPlayer.setupPlayer({})
   .then(() => {
-    TrackPlayer.add(track);
+    TrackPlayer.add(tracks);
   })
   .catch(console.error);
 
@@ -150,6 +161,29 @@ TrackPlayer.updateOptions({
 
 const App: () => Node = () => {
   const [selectedScene, setSelectedScene] = useState(scenes[1]);
+  const [kassidaSelectorOpen, setKassidaSelectorOpen] = useState(false);
+  const [selectedKassida, setSelectedKassida] = useState(kassidas[0]);
+
+  useEffect(() => {
+    async function skipToTrack() {
+      const index = kassidas.indexOf(selectedKassida);
+      if ((await TrackPlayer.getCurrentTrack()) !== index) {
+        TrackPlayer.skip(index);
+      }
+    }
+    skipToTrack();
+  }, [selectedKassida]);
+
+  useEffect(() => {
+    TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
+      const nextTrack = data.nextTrack;
+      if (nextTrack === null) {
+        return;
+      }
+      setSelectedKassida(kassidas[nextTrack]);
+    });
+  }, []);
+
   return (
     <View flex>
       <Picker
@@ -172,10 +206,22 @@ const App: () => Node = () => {
           />
         ))}
       </Picker>
+      <Dialog
+        visible={kassidaSelectorOpen}
+        onDismiss={() => setKassidaSelectorOpen(false)}>
+        <KassidaSelector
+          kassidas={kassidas}
+          onSelect={kassida => {
+            setSelectedKassida(kassida);
+            setKassidaSelectorOpen(false);
+          }}
+        />
+      </Dialog>
       <SceneRenderer
-        kassida={kassida}
+        kassida={selectedKassida}
         variantIndex={0}
         sceneConfig={selectedScene.config}
+        onTrackListOpen={() => setKassidaSelectorOpen(true)}
       />
     </View>
   );

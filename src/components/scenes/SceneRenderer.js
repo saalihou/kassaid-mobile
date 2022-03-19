@@ -7,27 +7,55 @@ import View from 'react-native-ui-lib/view';
 
 import type {Kassida} from '../../types/kassida/Kassida';
 import FloatingLyrics from '../kassida/FloatingLyrics';
+import type {FloatingLyricsProps} from '../kassida/FloatingLyrics';
 import Player from '../kassida/Player';
+import type {PlayerProps} from '../kassida/Player';
 
 export type SceneElementType = 'FLOATING_LYRICS' | 'PLAYER';
 
-type SceneElement = {
+type FloatingLyricsSceneElement = {
   key: string,
-  type: SceneElementType,
-  props?: Object,
+  type: 'FLOATING_LYRICS',
+  props?: $Diff<
+    FloatingLyricsProps,
+    {
+      kassida: Kassida,
+      variantIndex: number,
+    },
+  >,
+};
+type PlayerSceneElement = {
+  key: string,
+  type: 'PLAYER',
+  props?: $Diff<
+    PlayerProps,
+    {
+      kassida: Kassida,
+      variantIndex: number,
+      onNamePress: () => void,
+    },
+  >,
 };
 
-type SceneConfig = {
+type SceneElement = FloatingLyricsSceneElement | PlayerSceneElement;
+
+export type SceneConfig = {
   elements: SceneElement[],
 };
 
-type SceneProps = {
+type SceneRendererProps = {
   kassida: Kassida,
   variantIndex: number,
   sceneConfig: SceneConfig,
+  onTrackListOpen: () => void,
 };
 
-const SceneRenderer = ({kassida, variantIndex, sceneConfig}: SceneProps) => {
+const SceneRenderer = ({
+  kassida,
+  variantIndex,
+  sceneConfig,
+  onTrackListOpen,
+}: SceneRendererProps) => {
   return (
     <View
       flex
@@ -43,14 +71,20 @@ const SceneRenderer = ({kassida, variantIndex, sceneConfig}: SceneProps) => {
               key={element.key}
               kassida={kassida}
               variantIndex={0}
-              lang={element.props ? element.props.lang : 'fr'}
+              {...element.props}
             />
           );
         }
 
         if (element.type === 'PLAYER') {
           return (
-            <Player key={element.key} kassida={kassida} variantIndex={0} />
+            <Player
+              key={element.key}
+              kassida={kassida}
+              variantIndex={0}
+              onNamePress={onTrackListOpen}
+              {...element.props}
+            />
           );
         }
       })}

@@ -12,13 +12,16 @@ const timeStringToSeconds = timeString => {
 };
 
 const transcriptionSegments = segmentStrings
-  .map(segmentString => {
+  .map((segmentString, index) => {
     if (!segmentString) {
       return null;
     }
-    const transcriptionParts = /(\d+:\d+),(\d+:\d+) (\d+),(\d+)/.exec(
-      segmentString,
-    );
+    const formatRegex = /(\d+:\d+) (\d+),(\d+)/;
+    const previousSegmentString = segmentStrings[index - 1];
+    const transcriptionParts = formatRegex.exec(segmentString);
+    const previousSegmentParts = previousSegmentString
+      ? formatRegex.exec(previousSegmentString)
+      : null;
 
     if (!transcriptionParts) {
       throw new Error('Wrong format for segment string ' + segmentString);
@@ -26,12 +29,14 @@ const transcriptionSegments = segmentStrings
 
     return {
       timestamp: {
-        start: timeStringToSeconds(transcriptionParts[1]),
-        end: timeStringToSeconds(transcriptionParts[2]),
+        start: previousSegmentParts
+          ? timeStringToSeconds(previousSegmentParts[1])
+          : 0,
+        end: timeStringToSeconds(transcriptionParts[1]),
       },
       contentRef: {
-        start: parseInt(timeStringToSeconds(transcriptionParts[3]), 10),
-        end: parseInt(timeStringToSeconds(transcriptionParts[4]), 10),
+        start: parseInt(timeStringToSeconds(transcriptionParts[2]), 10),
+        end: parseInt(timeStringToSeconds(transcriptionParts[3]), 10),
       },
     };
   })
