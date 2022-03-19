@@ -28,6 +28,14 @@ const localeLabels = {
   arSN: 'ولوف',
 };
 
+const fontSizePerLocale = {
+  fr: 15,
+  en: 15,
+  ar: 20,
+  arSN: 20,
+  frSN: 15,
+};
+
 const FloatingLyrics = ({
   kassida,
   variantIndex,
@@ -110,7 +118,13 @@ const FloatingLyrics = ({
         <Button round outline onPress={goToPreviousSegment}>
           <Icon name="fast-rewind" color={Colors.primary} />
         </Button>
-        <Text center text30 style={styles.lyricsContent}>
+        <Text
+          center
+          text30
+          style={[
+            styles.lyricsContent,
+            {fontSize: fontSizePerLocale[lang] || 16},
+          ]}>
           {segmentContent}
         </Text>
         <Button round outline onPress={goToNextSegment}>

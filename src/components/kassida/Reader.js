@@ -58,7 +58,8 @@ const Reader = ({kassida, lang}: ReaderProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginVertical: 30,
+    marginHorizontal: 20,
     borderStyle: 'dotted',
     borderColor: Colors.black,
     borderWidth: 5,
