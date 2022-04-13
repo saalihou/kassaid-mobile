@@ -4,11 +4,8 @@
 import React, {useMemo, useState} from 'react';
 import {useProgress} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
-import Button from 'react-native-ui-lib/button';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import {StyleSheet} from 'react-native';
-import {Card, Text, Colors, Dialog} from 'react-native-ui-lib';
-import TrackPlayer from 'react-native-track-player';
+import {Card, Text, Dialog} from 'react-native-ui-lib';
 
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
@@ -78,35 +75,6 @@ const FloatingLyrics = ({
           .join('\n')
       : 'Pas de transcription disponible';
 
-  const goToPreviousSegment = () => {
-    const currentSegmentIndex = transcriptionSegments.indexOf(currentSegment);
-    const previousSegmentIndex =
-      currentSegmentIndex === 0
-        ? 0
-        : currentSegmentIndex === -1
-        ? transcriptionSegments.length - 1
-        : currentSegmentIndex - 1;
-    const previousSegment = transcriptionSegments[previousSegmentIndex];
-    if (previousSegment) {
-      TrackPlayer.seekTo(previousSegment.timestamp.start);
-    }
-  };
-
-  const goToNextSegment = () => {
-    const currentSegmentIndex = transcriptionSegments.indexOf(currentSegment);
-    if (
-      currentSegmentIndex === -1 ||
-      currentSegmentIndex === transcriptionSegments.length - 1
-    ) {
-      return;
-    }
-    const nextSegmentIndex = currentSegmentIndex + 1;
-    const nextSegment = transcriptionSegments[nextSegmentIndex];
-    if (nextSegment) {
-      TrackPlayer.seekTo(nextSegment.timestamp.start);
-    }
-  };
-
   return (
     <Card
       enableShadow
@@ -115,9 +83,6 @@ const FloatingLyrics = ({
       marginB-20
       onPress={() => setExpanded(true)}>
       <View style={styles.floatingLyrics} row center>
-        <Button round outline onPress={goToPreviousSegment}>
-          <Icon name="fast-rewind" color={Colors.primary} />
-        </Button>
         <Text
           center
           text30
@@ -130,9 +95,6 @@ const FloatingLyrics = ({
           ]}>
           {segmentContent}
         </Text>
-        <Button round outline onPress={goToNextSegment}>
-          <Icon name="fast-forward" color={Colors.primary} />
-        </Button>
       </View>
       <Text text80BL grey50>
         {localeLabels[lang]}
