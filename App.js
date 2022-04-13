@@ -13,9 +13,8 @@ import View from 'react-native-ui-lib/view';
 
 import SceneRenderer from './src/components/scenes/SceneRenderer';
 import type {SceneConfig} from './src/components/scenes/SceneRenderer';
-import {Picker} from '@react-native-picker/picker';
-import {Colors, Dialog} from 'react-native-ui-lib';
-import {StyleSheet} from 'react-native';
+import {Button, Colors, Dialog} from 'react-native-ui-lib';
+
 import KassidaSelector from './src/components/kassida/KassidaSelector';
 
 type Scene = {
@@ -26,20 +25,8 @@ type Scene = {
 
 const scenes: Scene[] = [
   {
-    key: 'PLAYER_ONLY',
-    name: 'Lecture Seule',
-    config: {
-      elements: [
-        {
-          key: 'PLAYER',
-          type: 'PLAYER',
-        },
-      ],
-    },
-  },
-  {
     key: 'AR_FR_TRANSCRIPTION',
-    name: 'Transcription Arabe/Français',
+    name: 'Français',
     config: {
       elements: [
         {
@@ -65,7 +52,7 @@ const scenes: Scene[] = [
   },
   {
     key: 'AR_EN_TRANSCRIPTION',
-    name: 'Transcription Arabic/English',
+    name: 'English',
     config: {
       elements: [
         {
@@ -91,7 +78,7 @@ const scenes: Scene[] = [
   },
   {
     key: 'FRSN_TRANSCRIPTION',
-    name: 'Transcription Wolof',
+    name: 'Wolofal',
     config: {
       elements: [
         {
@@ -101,18 +88,6 @@ const scenes: Scene[] = [
             lang: 'frSN',
           },
         },
-        {
-          key: 'PLAYER',
-          type: 'PLAYER',
-        },
-      ],
-    },
-  },
-  {
-    key: 'AR_TRANSCRIPTION',
-    name: 'Transcription Arabe',
-    config: {
-      elements: [
         {
           key: 'FLOATING_LYRICS_AR',
           type: 'FLOATING_LYRICS',
@@ -160,7 +135,7 @@ TrackPlayer.updateOptions({
 });
 
 const App: () => Node = () => {
-  const [selectedScene, setSelectedScene] = useState(scenes[1]);
+  const [selectedScene, setSelectedScene] = useState(scenes[0]);
   const [kassidaSelectorOpen, setKassidaSelectorOpen] = useState(false);
   const [selectedKassida, setSelectedKassida] = useState(kassidas[0]);
 
@@ -186,26 +161,21 @@ const App: () => Node = () => {
 
   return (
     <View flex>
-      <Picker
-        placeholder="Scène"
-        selectedValue={selectedScene.key}
-        onValueChange={sceneKey => {
-          const pickedScene = scenes.find(scene => scene.key === sceneKey);
-          if (pickedScene) {
-            setSelectedScene(pickedScene);
-          }
-        }}
-        style={styles.scenePicker}
-        dropdownIconColor={Colors.primary}>
+      <View row center padding-10>
         {scenes.map(scene => (
-          <Picker.Item
-            style={styles.scenePickerItem}
+          <Button
             key={scene.key}
-            value={scene.key}
+            onPress={() => {
+              setSelectedScene(scene);
+            }}
             label={scene.name}
+            backgroundColor={
+              selectedScene === scene ? Colors.primary : Colors.white
+            }
+            color={selectedScene === scene ? Colors.white : Colors.primary}
           />
         ))}
-      </Picker>
+      </View>
       <Dialog
         visible={kassidaSelectorOpen}
         onDismiss={() => setKassidaSelectorOpen(false)}>
@@ -226,14 +196,5 @@ const App: () => Node = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  scenePicker: {
-    backgroundColor: Colors.white,
-  },
-  scenePickerItem: {
-    color: Colors.black,
-  },
-});
 
 export default App;
