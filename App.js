@@ -105,8 +105,8 @@ const scenes: Scene[] = [
 ];
 
 const kassidas = [
-  require('./src/fixtures/madalkhabirou.json'),
   require('./src/fixtures/matlabouchifai.json'),
+  require('./src/fixtures/madalkhabirou.json'),
 ];
 const tracks = kassidas.map(kassida => ({
   url: kassida.variants[0].audio.url,
@@ -161,7 +161,7 @@ const App: () => Node = () => {
 
   return (
     <View flex>
-      <View row center padding-10>
+      <View row center padding-10 backgroundColor={Colors.white}>
         {scenes.map(scene => (
           <Button
             key={scene.key}
