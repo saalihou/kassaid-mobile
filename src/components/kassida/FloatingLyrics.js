@@ -1,13 +1,13 @@
 /**
  * @flow
  */
-import React, {useMemo, useState} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 import {useProgress} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform, UIManager, LayoutAnimation} from 'react-native';
 import {Card, Text, Dialog} from 'react-native-ui-lib';
 
-import type {Kassida} from '../../types/kassida/Kassida';
+import type {Kassida, TranscriptionSegment} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import Reader from './Reader';
 
@@ -32,6 +32,12 @@ const fontSizePerLocale = {
   arSN: 26,
   frSN: 18,
 };
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const FloatingLyrics = ({
   kassida,
@@ -41,6 +47,8 @@ const FloatingLyrics = ({
   const [expanded, setExpanded] = useState(false);
   const kassidaVariant = kassida.variants[variantIndex];
   const progress = useProgress(1000);
+  const [currentSegment, setCurrentSegment] =
+    useState<TranscriptionSegment | null>(null);
 
   const transcriptionSegments = kassidaVariant.transcriptionSegments[lang];
 
@@ -58,11 +66,9 @@ const FloatingLyrics = ({
     [transcriptionSegments, kassidaVariant],
   );
 
-  if (!transcriptionSegments || !secondsToSegmentIndexer) {
-    return null;
-  }
-
-  const currentSegment = secondsToSegmentIndexer[Math.round(progress.position)];
+  const computedCurrentSegment = secondsToSegmentIndexer
+    ? secondsToSegmentIndexer[Math.round(progress.position)]
+    : null;
   const segmentContent =
     currentSegment && kassida.content[lang] && currentSegment.contentRef
       ? kassida.content[lang]
@@ -74,6 +80,17 @@ const FloatingLyrics = ({
           )
           .join('\n')
       : 'Pas de transcription disponible';
+
+  // We manually setCurrentSegment in order to setup the next animation
+  // before rendering
+  useEffect(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setCurrentSegment(computedCurrentSegment);
+  }, [computedCurrentSegment]);
+
+  if (!transcriptionSegments || !secondsToSegmentIndexer) {
+    return null;
+  }
 
   return (
     <Card
@@ -109,7 +126,6 @@ const FloatingLyrics = ({
 const styles = StyleSheet.create({
   floatingLyrics: {
     justifyContent: 'center',
-    height: 150,
   },
   lyricsContent: {
     width: '90%',

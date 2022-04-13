@@ -29,7 +29,7 @@ type KasidaVariant = {
   },
 };
 
-type TranscriptionSegment = {
+export type TranscriptionSegment = {
   contentRef: {
     start: number,
     end: number,
