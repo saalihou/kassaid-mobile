@@ -5,6 +5,7 @@ import SceneRenderer from './src/components/scenes/SceneRenderer';
 import type {SceneConfig} from './src/components/scenes/SceneRenderer';
 import {Button, Colors, Dialog, SafeAreaSpacerView} from 'react-native-ui-lib';
 import KassidaSelector from './src/components/kassida/KassidaSelector';
+import {Kassida} from './src/types/kassida/Kassida';
 type Scene = {
   key: string;
   name: string;
@@ -90,7 +91,7 @@ const scenes: Scene[] = [
     },
   },
 ];
-const kassidas = [
+const kassidas: Kassida[] = [
   require('./src/fixtures/matlabouchifai.json'),
   require('./src/fixtures/madalkhabirou.json'),
 ];
