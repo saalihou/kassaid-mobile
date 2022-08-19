@@ -3,7 +3,7 @@ import TrackPlayer, {Capability, Event} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
 import SceneRenderer from './src/components/scenes/SceneRenderer';
 import type {SceneConfig} from './src/components/scenes/SceneRenderer';
-import {Button, Colors, Dialog} from 'react-native-ui-lib';
+import {Button, Colors, Dialog, SafeAreaSpacerView} from 'react-native-ui-lib';
 import KassidaSelector from './src/components/kassida/KassidaSelector';
 type Scene = {
   key: string;
@@ -145,6 +145,7 @@ const App = () => {
   }, []);
   return (
     <View flex>
+      <SafeAreaSpacerView />
       <View row center padding-10 backgroundColor={Colors.white}>
         {scenes.map(scene => (
           <Button
@@ -177,6 +178,7 @@ const App = () => {
         sceneConfig={selectedScene.config}
         onTrackListOpen={() => setKassidaSelectorOpen(true)}
       />
+      <SafeAreaSpacerView />
     </View>
   );
 };
