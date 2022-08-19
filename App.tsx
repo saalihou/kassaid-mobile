@@ -107,7 +107,6 @@ TrackPlayer.setupPlayer({})
   })
   .catch(console.error);
 TrackPlayer.updateOptions({
-  stopWithApp: true,
   capabilities: [
     Capability.Play,
     Capability.Pause,

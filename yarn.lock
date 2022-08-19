@@ -6270,10 +6270,10 @@ react-native-text-size@4.0.0-rc.1:
   resolved "https://registry.yarnpkg.com/react-native-text-size/-/react-native-text-size-4.0.0-rc.1.tgz#1e048d345dd6a5a8e1269e0585c1a5948c478da5"
   integrity sha512-CysqjU2jK6Yc+a+kEI222pUyTY2ywcU2HqbFqf1KHymW6OPTdvBBHqbEJKL0QiLhQaFYDbqicM+h990s9TP00g==
 
-react-native-track-player@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-2.1.0.tgz#204f184a4486a955b0e7ce71374e9ce41896b41f"
-  integrity sha512-4TmTns5sgvDYVY7qujsyv82UBg4JgLN6VdXHwRkqJ5AJw+Qq+eDJtoR5HxZZD8UhW7Iu1AF5g2vw1hhGWomVOQ==
+react-native-track-player@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-3.1.0.tgz#683f862dee01058169121101f73d6d23c0540a06"
+  integrity sha512-IJBprPO2YVA/iMgI317ny/tAFVDir2dy6w2t1BVeb+j1788MYBhO9VcygyyONGKckn8NwtnmsrP9r61CcwJLPA==
 
 react-native-ui-lib@^6.20.1:
   version "6.20.1"
