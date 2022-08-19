@@ -1,19 +1,13 @@
-/**
- * @flow
- */
 import React from 'react';
 import {Card, Colors, Text, View} from 'react-native-ui-lib';
 import {ScrollView, StyleSheet} from 'react-native';
 import chunk from 'lodash/chunk';
-
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
-
 type ReaderProps = {
-  kassida: Kassida,
-  lang: Locale,
+  kassida: Kassida;
+  lang: Locale;
 };
-
 const alignmentByLang = {
   fr: 'left',
   en: 'left',
@@ -24,9 +18,11 @@ const alignmentByLang = {
 
 const Reader = ({kassida, lang}: ReaderProps) => {
   const content = kassida.content[lang];
+
   if (!content) {
     return null;
   }
+
   const verses = chunk(content.split('\n'), 2);
   return (
     <Card style={styles.container}>
@@ -79,5 +75,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 });
-
 export default Reader;

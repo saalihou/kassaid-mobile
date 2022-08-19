@@ -1,20 +1,15 @@
-/**
- * @flow
- */
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Card, ListItem, Text, View} from 'react-native-ui-lib';
-
 import type {Kassida} from '../../types/kassida/Kassida';
-
 type KassidaSelectorProps = {
-  kassidas: Kassida[],
-  onSelect: (kassida: Kassida) => void,
+  kassidas: Kassida[];
+  onSelect: (kassida: Kassida) => void;
 };
 
 const KassidaSelector = ({kassidas, onSelect}: KassidaSelectorProps) => {
   return (
-    <Card padding={10}>
+    <Card padding>
       {kassidas.map(kassida => (
         <ListItem
           key={kassida.name.fr}
@@ -40,5 +35,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
 export default KassidaSelector;

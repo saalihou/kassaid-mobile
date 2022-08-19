@@ -1,22 +1,16 @@
-/**
- * @flow
- */
 import React, {useMemo, useState, useEffect} from 'react';
 import {useProgress} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
 import {StyleSheet, Platform, UIManager, LayoutAnimation} from 'react-native';
 import {Card, Text, Dialog} from 'react-native-ui-lib';
-
 import type {Kassida, TranscriptionSegment} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import Reader from './Reader';
-
 export type FloatingLyricsProps = {
-  kassida: Kassida,
-  variantIndex: number,
-  lang?: Locale,
+  kassida: Kassida;
+  variantIndex: number;
+  lang?: Locale;
 };
-
 const localeLabels = {
   fr: 'Français',
   ar: 'عرب',
@@ -24,7 +18,6 @@ const localeLabels = {
   frSN: 'Wolof',
   arSN: 'ولوف',
 };
-
 const fontSizePerLocale = {
   fr: 18,
   en: 18,
@@ -32,6 +25,7 @@ const fontSizePerLocale = {
   arSN: 26,
   frSN: 18,
 };
+
 if (
   Platform.OS === 'android' &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -49,9 +43,7 @@ const FloatingLyrics = ({
   const progress = useProgress(1000);
   const [currentSegment, setCurrentSegment] =
     useState<TranscriptionSegment | null>(null);
-
   const transcriptionSegments = kassidaVariant.transcriptionSegments[lang];
-
   const secondsToSegmentIndexer = useMemo(
     () =>
       transcriptionSegments
@@ -65,13 +57,13 @@ const FloatingLyrics = ({
         : null,
     [transcriptionSegments, kassidaVariant],
   );
-
   const computedCurrentSegment = secondsToSegmentIndexer
-    ? secondsToSegmentIndexer[Math.round(progress.position)]
+    ? secondsToSegmentIndexer[Math.round(progress.position)] || null
     : null;
+  const langContent = kassida.content[lang];
   const segmentContent =
-    currentSegment && kassida.content[lang] && currentSegment.contentRef
-      ? kassida.content[lang]
+    currentSegment && langContent && currentSegment.contentRef
+      ? langContent
           .split('\n')
           .slice(
             // Start and end lines are indexed from 1
@@ -80,7 +72,6 @@ const FloatingLyrics = ({
           )
           .join('\n')
       : 'Pas de transcription disponible';
-
   // We manually setCurrentSegment in order to setup the next animation
   // before rendering
   useEffect(() => {
@@ -132,5 +123,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
 export default FloatingLyrics;

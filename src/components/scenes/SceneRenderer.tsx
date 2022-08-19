@@ -1,58 +1,35 @@
-/**
- * @flow
- */
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import View from 'react-native-ui-lib/view';
-
 import type {Kassida} from '../../types/kassida/Kassida';
 import FloatingLyrics from '../kassida/FloatingLyrics';
 import type {FloatingLyricsProps} from '../kassida/FloatingLyrics';
 import Player from '../kassida/Player';
 import type {PlayerProps} from '../kassida/Player';
-
 export type SceneElementType = 'FLOATING_LYRICS' | 'PLAYER';
-
 type FloatingLyricsSceneElement = {
-  key: string,
-  type: 'FLOATING_LYRICS',
-  props?: $Diff<
-    FloatingLyricsProps,
-    {
-      kassida: Kassida,
-      variantIndex: number,
-    },
-  >,
+  key: string;
+  type: 'FLOATING_LYRICS';
+  props?: Omit<FloatingLyricsProps, 'kassida' | 'variantIndex'>;
 };
 type PlayerSceneElement = {
-  key: string,
-  type: 'PLAYER',
-  props?: $Diff<
-    PlayerProps,
-    {
-      kassida: Kassida,
-      variantIndex: number,
-      onNamePress: () => void,
-    },
-  >,
+  key: string;
+  type: 'PLAYER';
+  props?: Omit<PlayerProps, 'kassida' | 'variantIndex' | 'onNamePress'>;
 };
-
 type SceneElement = FloatingLyricsSceneElement | PlayerSceneElement;
-
 export type SceneConfig = {
-  elements: SceneElement[],
+  elements: SceneElement[];
 };
-
 type SceneRendererProps = {
-  kassida: Kassida,
-  variantIndex: number,
-  sceneConfig: SceneConfig,
-  onTrackListOpen: () => void,
+  kassida: Kassida;
+  variantIndex: number;
+  sceneConfig: SceneConfig;
+  onTrackListOpen: () => void;
 };
 
 const SceneRenderer = ({
   kassida,
-  variantIndex,
   sceneConfig,
   onTrackListOpen,
 }: SceneRendererProps) => {
@@ -92,6 +69,7 @@ const SceneRenderer = ({
   );
 };
 
-const styles = StyleSheet.create({});
-
+const styles = StyleSheet.create({
+  sceneRenderer: {},
+});
 export default SceneRenderer;

@@ -1,28 +1,15 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, {useState, useEffect} from 'react';
-import type {Node} from 'react';
 import TrackPlayer, {Capability, Event} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
-
 import SceneRenderer from './src/components/scenes/SceneRenderer';
 import type {SceneConfig} from './src/components/scenes/SceneRenderer';
 import {Button, Colors, Dialog} from 'react-native-ui-lib';
-
 import KassidaSelector from './src/components/kassida/KassidaSelector';
-
 type Scene = {
-  key: string,
-  name: string,
-  config: SceneConfig,
+  key: string;
+  name: string;
+  config: SceneConfig;
 };
-
 const scenes: Scene[] = [
   {
     key: 'AR_FR_TRANSCRIPTION',
@@ -103,7 +90,6 @@ const scenes: Scene[] = [
     },
   },
 ];
-
 const kassidas = [
   require('./src/fixtures/matlabouchifai.json'),
   require('./src/fixtures/madalkhabirou.json'),
@@ -115,13 +101,11 @@ const tracks = kassidas.map(kassida => ({
   artwork: kassida.variants[0].preview.url,
   duration: kassida.variants[0].duration, // Duration in seconds
 }));
-
 TrackPlayer.setupPlayer({})
   .then(() => {
     TrackPlayer.add(tracks);
   })
   .catch(console.error);
-
 TrackPlayer.updateOptions({
   stopWithApp: true,
   capabilities: [
@@ -134,31 +118,32 @@ TrackPlayer.updateOptions({
   compactCapabilities: [Capability.Play, Capability.Pause],
 });
 
-const App: () => Node = () => {
+const App = () => {
   const [selectedScene, setSelectedScene] = useState(scenes[0]);
   const [kassidaSelectorOpen, setKassidaSelectorOpen] = useState(false);
   const [selectedKassida, setSelectedKassida] = useState(kassidas[0]);
-
   useEffect(() => {
     async function skipToTrack() {
       const index = kassidas.indexOf(selectedKassida);
+
       if ((await TrackPlayer.getCurrentTrack()) !== index) {
         TrackPlayer.skip(index);
       }
     }
+
     skipToTrack();
   }, [selectedKassida]);
-
   useEffect(() => {
     TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
       const nextTrack = data.nextTrack;
+
       if (nextTrack === null) {
         return;
       }
+
       setSelectedKassida(kassidas[nextTrack]);
     });
   }, []);
-
   return (
     <View flex>
       <View row center padding-10 backgroundColor={Colors.white}>
