@@ -1,22 +1,15 @@
-import React, {useMemo, useState, useEffect} from 'react';
-import {useProgress} from 'react-native-track-player';
-import View from 'react-native-ui-lib/view';
-import {StyleSheet, Platform, UIManager, LayoutAnimation} from 'react-native';
-import {Card, Text, Dialog} from 'react-native-ui-lib';
-import type {Kassida, TranscriptionSegment} from '../../types/kassida/Kassida';
+import React, {useMemo, useState, useEffect, useRef} from 'react';
+import {State, usePlaybackState, useProgress} from 'react-native-track-player';
+import {StyleSheet, Platform, UIManager, Animated, Easing} from 'react-native';
+import {Card, Text, Dialog, Colors} from 'react-native-ui-lib';
+import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import Reader from './Reader';
+import {ScrollView} from 'react-native-gesture-handler';
 export type FloatingLyricsProps = {
   kassida: Kassida;
   variantIndex: number;
   lang?: Locale;
-};
-const localeLabels = {
-  fr: 'Français',
-  ar: 'عرب',
-  en: 'English',
-  frSN: 'Wolof',
-  arSN: 'ولوف',
 };
 const fontSizePerLocale = {
   fr: 18,
@@ -41,8 +34,7 @@ const FloatingLyrics = ({
   const [expanded, setExpanded] = useState(false);
   const kassidaVariant = kassida.variants[variantIndex];
   const progress = useProgress(1000);
-  const [currentSegment, setCurrentSegment] =
-    useState<TranscriptionSegment | null>(null);
+  const playbackState = usePlaybackState();
   const transcriptionSegments = kassidaVariant.transcriptionSegments[lang];
   const secondsToSegmentIndexer = useMemo(
     () =>
@@ -57,27 +49,57 @@ const FloatingLyrics = ({
         : null,
     [transcriptionSegments, kassidaVariant],
   );
-  const computedCurrentSegment = secondsToSegmentIndexer
-    ? secondsToSegmentIndexer[Math.round(progress.position)] || null
-    : null;
-  const langContent = kassida.content[lang];
-  const segmentContent =
-    currentSegment && langContent && currentSegment.contentRef
-      ? langContent
-          .split('\n')
-          .slice(
-            // Start and end lines are indexed from 1
-            currentSegment.contentRef.start - 1,
-            currentSegment.contentRef.end,
-          )
-          .join('\n')
-      : 'Pas de transcription disponible';
-  // We manually setCurrentSegment in order to setup the next animation
-  // before rendering
+
+  // const y = useRef(0);
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollAnimation = useRef<Animated.Value>(new Animated.Value(0));
+  const [contentHeight, setContentHeight] = useState(0);
+
   useEffect(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setCurrentSegment(computedCurrentSegment);
-  }, [computedCurrentSegment]);
+    const startDelayPercentage =
+      (kassidaVariant.transcriptionStartDelay || 0) / kassidaVariant.duration;
+    const startDelayOffset = startDelayPercentage * contentHeight;
+    scrollAnimation.current.setValue(-startDelayOffset);
+  }, [
+    kassidaVariant.transcriptionStartDelay,
+    kassidaVariant.duration,
+    contentHeight,
+  ]);
+
+  const kassidaText = kassida.content[lang];
+  const kassidaTextLinesByTwo = useMemo(() => {
+    const kassidaTextLines = kassidaText?.split('\n') || [];
+    const linesByTwo = [];
+    for (let i = 0; i < kassidaTextLines.length; i += 2) {
+      linesByTwo.push(kassidaTextLines.slice(i, i + 2).join('\n'));
+    }
+    return linesByTwo;
+  }, [kassidaText]);
+
+  useEffect(() => {
+    if (playbackState === State.Playing) {
+      scrollAnimation.current.addListener(animation => {
+        scrollRef.current &&
+          scrollRef.current.scrollTo({
+            y: Math.max(animation.value, 0),
+            animated: false,
+          });
+      });
+
+      if (contentHeight && progress.duration) {
+        Animated.timing(scrollAnimation.current, {
+          toValue: contentHeight,
+          duration: progress.duration * 1000,
+          useNativeDriver: true,
+          easing: Easing.linear,
+        }).start();
+      }
+    } else {
+      scrollAnimation.current.stopAnimation();
+    }
+    const scrollAnimationCurrent = scrollAnimation.current;
+    return () => scrollAnimationCurrent.removeAllListeners();
+  }, [contentHeight, progress.duration, playbackState]);
 
   if (!transcriptionSegments || !secondsToSegmentIndexer) {
     return null;
@@ -88,25 +110,48 @@ const FloatingLyrics = ({
       enableShadow
       elevation={20}
       padding-20
+      paddingT-10
       marginB-20
-      onPress={() => setExpanded(true)}>
-      <View style={styles.floatingLyrics} row center>
-        <Text
-          center
-          text30
-          style={[
-            styles.lyricsContent,
-            {
-              fontSize: fontSizePerLocale[lang] || 16,
-              lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
-            },
-          ]}>
-          {segmentContent}
-        </Text>
-      </View>
-      <Text text80BL grey50>
-        {localeLabels[lang]}
-      </Text>
+      flex
+      // onPress={() => setExpanded(true)}
+    >
+      <Animated.ScrollView
+        ref={scrollRef}
+        onContentSizeChange={(width, height) => {
+          setContentHeight(height);
+        }}
+        onScrollBeginDrag={() => scrollAnimation.current.stopAnimation()}
+        onScrollEndDrag={event => {
+          scrollAnimation.current.setValue(event.nativeEvent.contentOffset.y);
+          Animated.timing(scrollAnimation.current, {
+            toValue: contentHeight,
+            duration: progress.duration * 1000 - progress.position * 1000,
+            useNativeDriver: true,
+            easing: Easing.linear,
+          }).start();
+        }}
+        style={styles.floatingLyrics}
+        contentContainerStyle={styles.floatingLyricsContent}>
+        {kassidaTextLinesByTwo.map((line, index) => (
+          <Text
+            key={index}
+            center
+            text30
+            style={[
+              styles.lyricsContent,
+              {
+                fontSize: fontSizePerLocale[lang] || 16,
+                lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
+              },
+
+              index % 2 === 0
+                ? styles.evenFloatingLyricsContent
+                : styles.oddFloatingLyricsContent,
+            ]}>
+            {line}
+          </Text>
+        ))}
+      </Animated.ScrollView>
       <Dialog visible={expanded} onDismiss={() => setExpanded(false)}>
         <Reader kassida={kassida} lang={lang} />
       </Dialog>
@@ -115,12 +160,20 @@ const FloatingLyrics = ({
 };
 
 const styles = StyleSheet.create({
-  floatingLyrics: {
-    justifyContent: 'center',
-  },
+  floatingLyrics: {},
+  floatingLyricsContent: {},
   lyricsContent: {
-    width: '90%',
     fontSize: 16,
+    textAlign: 'center',
+    paddingTop: 7.5,
+    paddingBottom: 7.5,
+  },
+  evenFloatingLyricsContent: {
+    backgroundColor: Colors.grey60,
+  },
+  oddFloatingLyricsContent: {
+    backgroundColor: Colors.white,
   },
 });
+
 export default FloatingLyrics;

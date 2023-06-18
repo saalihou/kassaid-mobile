@@ -13,6 +13,7 @@ type KasidaVariant = {
     url: string;
   };
   duration: number;
+  transcriptionStartDelay?: number;
   transcriptionSegments: {
     fr?: Array<TranscriptionSegment>;
     ar?: Array<TranscriptionSegment>;

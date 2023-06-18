@@ -15,12 +15,13 @@
         "fr": "HTDKH"
       },
       "audio": {
-        "url": "https://s3.eu-west-3.amazonaws.com/com.kassaid/audio/matlabou-chifai-htdkh.mp3"
+        "url": "https://s3.us-east-2.amazonaws.com/com.kassaid.app/kassaid/Khassida+Matlabou+Chifai+Transcription+en+Franc%CC%A7ais+et+Traduction+en+Wolof.mp3"
       },
       "preview": {
         "url": "https://lequotidien.sn/wp-content/uploads/2020/01/Cheikh-Ahmadou-Bamba.jpg"
       },
       "duration": 561,
+      "transcriptionStartDelay": 25,
       "transcriptionSegments": {
         "fr": [
           {
