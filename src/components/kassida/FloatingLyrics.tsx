@@ -100,12 +100,6 @@ const FloatingLyrics = ({
             Math.max(currentSegmentIndex - 1, 0),
           ),
         );
-        console.log(
-          'currentSegmeentIndex',
-          currentSegmentIndex,
-          'targetHeight',
-          targetHeight,
-        );
         Animated.timing(scrollAnimation.current, {
           toValue: targetHeight,
           duration: (progress.duration / kassidaTextLinesByTwo.length) * 1000,
@@ -174,7 +168,6 @@ const FloatingLyrics = ({
               }
               segmentHeightsRef.current[index] =
                 event.nativeEvent.layout.height;
-              console.log(lang, segmentHeightsRef.current);
             }}>
             <Text
               center
