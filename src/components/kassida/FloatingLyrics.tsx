@@ -1,16 +1,15 @@
 import React, {useMemo, useState, useEffect, useRef} from 'react';
 import {State, usePlaybackState, useProgress} from 'react-native-track-player';
 import {StyleSheet, Platform, UIManager, Animated, Easing} from 'react-native';
-import {Card, Text, Dialog, Colors, View} from 'react-native-ui-lib';
+import {Card, Text, Colors, View} from 'react-native-ui-lib';
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
-import Reader from './Reader';
 import {ScrollView} from 'react-native-gesture-handler';
 import {sum} from 'lodash';
 export type FloatingLyricsProps = {
   kassida: Kassida;
   variantIndex: number;
-  lang?: Locale;
+  langs?: Locale[];
 };
 const fontSizePerLocale = {
   fr: 10,
@@ -30,26 +29,11 @@ if (
 const FloatingLyrics = ({
   kassida,
   variantIndex,
-  lang = 'fr',
+  langs = [],
 }: FloatingLyricsProps) => {
-  const [expanded, setExpanded] = useState(false);
   const kassidaVariant = kassida.variants[variantIndex];
   const progress = useProgress(1000);
   const playbackState = usePlaybackState();
-  const transcriptionSegments = kassidaVariant.transcriptionSegments[lang];
-  const secondsToSegmentIndexer = useMemo(
-    () =>
-      transcriptionSegments
-        ? [...new Array(kassidaVariant.duration)].map((_, second) =>
-            transcriptionSegments.find(
-              segment =>
-                second >= segment.timestamp.start &&
-                second <= segment.timestamp.end,
-            ),
-          )
-        : null,
-    [transcriptionSegments, kassidaVariant],
-  );
 
   // const y = useRef(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -69,15 +53,17 @@ const FloatingLyrics = ({
     contentHeight,
   ]);
 
-  const kassidaText = kassida.content[lang];
   const kassidaTextLinesByTwo = useMemo(() => {
-    const kassidaTextLines = kassidaText?.split('\n') || [];
-    const linesByTwo = [];
-    for (let i = 0; i < kassidaTextLines.length; i += 2) {
-      linesByTwo.push(kassidaTextLines.slice(i, i + 2).join('\n'));
-    }
-    return linesByTwo;
-  }, [kassidaText]);
+    return langs.map(lang => {
+      const kassidaText = kassida.content[lang];
+      const kassidaTextLines = kassidaText?.split('\n') || [];
+      const linesByTwo = [];
+      for (let i = 0; i < kassidaTextLines.length; i += 2) {
+        linesByTwo.push(kassidaTextLines.slice(i, i + 2).join('\n'));
+      }
+      return linesByTwo;
+    });
+  }, [kassida.content, langs]);
 
   useEffect(() => {
     if (playbackState === State.Playing) {
@@ -92,7 +78,7 @@ const FloatingLyrics = ({
       if (contentHeight && progress.duration) {
         const currentSegmentIndex = Math.floor(
           (progress.position / progress.duration) *
-            kassidaTextLinesByTwo.length,
+            kassidaTextLinesByTwo[0].length,
         );
         const targetHeight = sum(
           segmentHeightsRef.current.slice(
@@ -102,7 +88,8 @@ const FloatingLyrics = ({
         );
         Animated.timing(scrollAnimation.current, {
           toValue: targetHeight,
-          duration: (progress.duration / kassidaTextLinesByTwo.length) * 1000,
+          duration:
+            (progress.duration / kassidaTextLinesByTwo[0].length) * 1000,
           useNativeDriver: true,
           easing: Easing.linear,
         }).start();
@@ -120,10 +107,6 @@ const FloatingLyrics = ({
     kassidaTextLinesByTwo,
     playbackState,
   ]);
-
-  if (!transcriptionSegments || !secondsToSegmentIndexer) {
-    return null;
-  }
 
   return (
     <Card
@@ -155,42 +138,50 @@ const FloatingLyrics = ({
         }}
         style={styles.floatingLyrics}
         contentContainerStyle={styles.floatingLyricsContent}>
-        {kassidaTextLinesByTwo.map((line, index) => (
+        {kassidaTextLinesByTwo[0].map((line, lineIndex) => (
           <View
-            key={index}
+            row
+            spread
+            key={lineIndex}
+            style={
+              lineIndex % 2 === 0
+                ? styles.evenFloatingLyricsContent
+                : styles.oddFloatingLyricsContent
+            }
             onLayout={event => {
               // expand the array if needed to a length of index
-              if (segmentHeightsRef.current.length <= index) {
+              if (segmentHeightsRef.current.length <= lineIndex) {
                 segmentHeightsRef.current = [
                   ...segmentHeightsRef.current,
-                  ...new Array(index - segmentHeightsRef.current.length + 1),
+                  ...new Array(
+                    lineIndex - segmentHeightsRef.current.length + 1,
+                  ),
                 ];
               }
-              segmentHeightsRef.current[index] =
+              segmentHeightsRef.current[lineIndex] =
                 event.nativeEvent.layout.height;
             }}>
-            <Text
-              center
-              text30
-              style={[
-                styles.lyricsContent,
-                {
-                  fontSize: fontSizePerLocale[lang] || 16,
-                  lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
-                },
-
-                index % 2 === 0
-                  ? styles.evenFloatingLyricsContent
-                  : styles.oddFloatingLyricsContent,
-              ]}>
-              {line}
-            </Text>
+            {langs.map((lang, langIndex) => {
+              return (
+                <View flex>
+                  <Text
+                    center
+                    text30
+                    style={[
+                      styles.lyricsContent,
+                      {
+                        fontSize: fontSizePerLocale[lang] || 16,
+                        lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
+                      },
+                    ]}>
+                    {kassidaTextLinesByTwo[langIndex][lineIndex]}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
         ))}
       </Animated.ScrollView>
-      <Dialog visible={expanded} onDismiss={() => setExpanded(false)}>
-        <Reader kassida={kassida} lang={lang} />
-      </Dialog>
     </Card>
   );
 };
@@ -203,6 +194,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingTop: 7.5,
     paddingBottom: 7.5,
+    // flex: 1,
   },
   evenFloatingLyricsContent: {
     backgroundColor: Colors.grey60,

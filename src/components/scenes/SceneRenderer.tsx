@@ -54,8 +54,7 @@ const SceneRenderer = ({
       backgroundColor="white"
       padding-10={padded}
       row={row}
-      spread={sceneConfig.elements.length > 2 ? true : false}
-      center={sceneConfig.elements.length <= 2 ? true : false}
+      spread
       style={styles.sceneRenderer}>
       {sceneConfig.elements.map(element => {
         if (element.type === 'FLOATING_LYRICS') {

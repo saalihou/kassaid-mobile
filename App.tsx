@@ -29,14 +29,7 @@ const scenes: Scene[] = [
                   key: 'FLOATING_LYRICS_FR',
                   type: 'FLOATING_LYRICS',
                   props: {
-                    lang: 'fr',
-                  },
-                },
-                {
-                  key: 'FLOATING_LYRICS_AR',
-                  type: 'FLOATING_LYRICS',
-                  props: {
-                    lang: 'ar',
+                    langs: ['fr', 'ar'],
                   },
                 },
               ],
@@ -67,14 +60,7 @@ const scenes: Scene[] = [
                   key: 'FLOATING_LYRICS_EN',
                   type: 'FLOATING_LYRICS',
                   props: {
-                    lang: 'en',
-                  },
-                },
-                {
-                  key: 'FLOATING_LYRICS_AR',
-                  type: 'FLOATING_LYRICS',
-                  props: {
-                    lang: 'ar',
+                    langs: ['en', 'ar'],
                   },
                 },
               ],
@@ -105,14 +91,7 @@ const scenes: Scene[] = [
                   key: 'FLOATING_LYRICS_FRSN',
                   type: 'FLOATING_LYRICS',
                   props: {
-                    lang: 'frSN',
-                  },
-                },
-                {
-                  key: 'FLOATING_LYRICS_AR',
-                  type: 'FLOATING_LYRICS',
-                  props: {
-                    lang: 'ar',
+                    langs: ['frSN', 'ar'],
                   },
                 },
               ],
@@ -135,7 +114,7 @@ const scenes: Scene[] = [
           key: 'FLOATING_LYRICS_AR',
           type: 'FLOATING_LYRICS',
           props: {
-            lang: 'ar',
+            langs: ['ar'],
           },
         },
         {
