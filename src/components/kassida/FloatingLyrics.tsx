@@ -1,22 +1,23 @@
 import React, {useMemo, useState, useEffect, useRef} from 'react';
 import {State, usePlaybackState, useProgress} from 'react-native-track-player';
 import {StyleSheet, Platform, UIManager, Animated, Easing} from 'react-native';
-import {Card, Text, Dialog, Colors} from 'react-native-ui-lib';
+import {Card, Text, Dialog, Colors, View} from 'react-native-ui-lib';
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import Reader from './Reader';
 import {ScrollView} from 'react-native-gesture-handler';
+import {sum} from 'lodash';
 export type FloatingLyricsProps = {
   kassida: Kassida;
   variantIndex: number;
   lang?: Locale;
 };
 const fontSizePerLocale = {
-  fr: 18,
-  en: 18,
-  ar: 26,
-  arSN: 26,
-  frSN: 18,
+  fr: 10,
+  en: 11,
+  ar: 18,
+  arSN: 10,
+  frSN: 13,
 };
 
 if (
@@ -54,6 +55,8 @@ const FloatingLyrics = ({
   const scrollRef = useRef<ScrollView>(null);
   const scrollAnimation = useRef<Animated.Value>(new Animated.Value(0));
   const [contentHeight, setContentHeight] = useState(0);
+  const [scrollHeight, setScrollHeight] = useState(0);
+  const segmentHeightsRef = useRef<number[]>([]);
 
   useEffect(() => {
     const startDelayPercentage =
@@ -87,9 +90,25 @@ const FloatingLyrics = ({
       });
 
       if (contentHeight && progress.duration) {
+        const currentSegmentIndex = Math.floor(
+          (progress.position / progress.duration) *
+            kassidaTextLinesByTwo.length,
+        );
+        const targetHeight = sum(
+          segmentHeightsRef.current.slice(
+            0,
+            Math.max(currentSegmentIndex - 1, 0),
+          ),
+        );
+        console.log(
+          'currentSegmeentIndex',
+          currentSegmentIndex,
+          'targetHeight',
+          targetHeight,
+        );
         Animated.timing(scrollAnimation.current, {
-          toValue: contentHeight,
-          duration: progress.duration * 1000,
+          toValue: targetHeight,
+          duration: (progress.duration / kassidaTextLinesByTwo.length) * 1000,
           useNativeDriver: true,
           easing: Easing.linear,
         }).start();
@@ -99,7 +118,14 @@ const FloatingLyrics = ({
     }
     const scrollAnimationCurrent = scrollAnimation.current;
     return () => scrollAnimationCurrent.removeAllListeners();
-  }, [contentHeight, progress.duration, playbackState]);
+  }, [
+    contentHeight,
+    progress.duration,
+    progress.position,
+    scrollHeight,
+    kassidaTextLinesByTwo,
+    playbackState,
+  ]);
 
   if (!transcriptionSegments || !secondsToSegmentIndexer) {
     return null;
@@ -109,7 +135,7 @@ const FloatingLyrics = ({
     <Card
       enableShadow
       elevation={20}
-      padding-20
+      // padding-20
       paddingT-10
       marginB-20
       flex
@@ -119,6 +145,9 @@ const FloatingLyrics = ({
         ref={scrollRef}
         onContentSizeChange={(width, height) => {
           setContentHeight(height);
+        }}
+        onLayout={event => {
+          setScrollHeight(event.nativeEvent.layout.height);
         }}
         onScrollBeginDrag={() => scrollAnimation.current.stopAnimation()}
         onScrollEndDrag={event => {
@@ -133,23 +162,37 @@ const FloatingLyrics = ({
         style={styles.floatingLyrics}
         contentContainerStyle={styles.floatingLyricsContent}>
         {kassidaTextLinesByTwo.map((line, index) => (
-          <Text
+          <View
             key={index}
-            center
-            text30
-            style={[
-              styles.lyricsContent,
-              {
-                fontSize: fontSizePerLocale[lang] || 16,
-                lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
-              },
+            onLayout={event => {
+              // expand the array if needed to a length of index
+              if (segmentHeightsRef.current.length <= index) {
+                segmentHeightsRef.current = [
+                  ...segmentHeightsRef.current,
+                  ...new Array(index - segmentHeightsRef.current.length + 1),
+                ];
+              }
+              segmentHeightsRef.current[index] =
+                event.nativeEvent.layout.height;
+              console.log(lang, segmentHeightsRef.current);
+            }}>
+            <Text
+              center
+              text30
+              style={[
+                styles.lyricsContent,
+                {
+                  fontSize: fontSizePerLocale[lang] || 16,
+                  lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
+                },
 
-              index % 2 === 0
-                ? styles.evenFloatingLyricsContent
-                : styles.oddFloatingLyricsContent,
-            ]}>
-            {line}
-          </Text>
+                index % 2 === 0
+                  ? styles.evenFloatingLyricsContent
+                  : styles.oddFloatingLyricsContent,
+              ]}>
+              {line}
+            </Text>
+          </View>
         ))}
       </Animated.ScrollView>
       <Dialog visible={expanded} onDismiss={() => setExpanded(false)}>

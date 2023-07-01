@@ -18,17 +18,29 @@ const scenes: Scene[] = [
     config: {
       elements: [
         {
-          key: 'FLOATING_LYRICS_FR',
-          type: 'FLOATING_LYRICS',
+          key: 'SCENE_RENDERER',
+          type: 'SCENE_RENDERER',
           props: {
-            lang: 'fr',
-          },
-        },
-        {
-          key: 'FLOATING_LYRICS_AR',
-          type: 'FLOATING_LYRICS',
-          props: {
-            lang: 'ar',
+            row: true,
+            padded: false,
+            sceneConfig: {
+              elements: [
+                {
+                  key: 'FLOATING_LYRICS_FR',
+                  type: 'FLOATING_LYRICS',
+                  props: {
+                    lang: 'fr',
+                  },
+                },
+                {
+                  key: 'FLOATING_LYRICS_AR',
+                  type: 'FLOATING_LYRICS',
+                  props: {
+                    lang: 'ar',
+                  },
+                },
+              ],
+            },
           },
         },
         {
@@ -44,17 +56,29 @@ const scenes: Scene[] = [
     config: {
       elements: [
         {
-          key: 'FLOATING_LYRICS_EN',
-          type: 'FLOATING_LYRICS',
+          key: 'SCENE_RENDERER',
+          type: 'SCENE_RENDERER',
           props: {
-            lang: 'en',
-          },
-        },
-        {
-          key: 'FLOATING_LYRICS_AR',
-          type: 'FLOATING_LYRICS',
-          props: {
-            lang: 'ar',
+            row: true,
+            padded: false,
+            sceneConfig: {
+              elements: [
+                {
+                  key: 'FLOATING_LYRICS_EN',
+                  type: 'FLOATING_LYRICS',
+                  props: {
+                    lang: 'en',
+                  },
+                },
+                {
+                  key: 'FLOATING_LYRICS_AR',
+                  type: 'FLOATING_LYRICS',
+                  props: {
+                    lang: 'ar',
+                  },
+                },
+              ],
+            },
           },
         },
         {
@@ -70,12 +94,43 @@ const scenes: Scene[] = [
     config: {
       elements: [
         {
-          key: 'FLOATING_LYRICS_FRSN',
-          type: 'FLOATING_LYRICS',
+          key: 'SCENE_RENDERER',
+          type: 'SCENE_RENDERER',
           props: {
-            lang: 'frSN',
+            row: true,
+            padded: false,
+            sceneConfig: {
+              elements: [
+                {
+                  key: 'FLOATING_LYRICS_FRSN',
+                  type: 'FLOATING_LYRICS',
+                  props: {
+                    lang: 'frSN',
+                  },
+                },
+                {
+                  key: 'FLOATING_LYRICS_AR',
+                  type: 'FLOATING_LYRICS',
+                  props: {
+                    lang: 'ar',
+                  },
+                },
+              ],
+            },
           },
         },
+        {
+          key: 'PLAYER',
+          type: 'PLAYER',
+        },
+      ],
+    },
+  },
+  {
+    key: 'DURUS',
+    name: 'Durus',
+    config: {
+      elements: [
         {
           key: 'FLOATING_LYRICS_AR',
           type: 'FLOATING_LYRICS',

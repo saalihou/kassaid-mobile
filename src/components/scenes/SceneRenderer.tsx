@@ -17,7 +17,18 @@ type PlayerSceneElement = {
   type: 'PLAYER';
   props?: Omit<PlayerProps, 'kassida' | 'variantIndex' | 'onNamePress'>;
 };
-type SceneElement = FloatingLyricsSceneElement | PlayerSceneElement;
+type SceneRendererElement = {
+  key: string;
+  type: 'SCENE_RENDERER';
+  props: Omit<
+    SceneRendererProps,
+    'kassida' | 'variantIndex' | 'onTrackListOpen'
+  >;
+};
+type SceneElement =
+  | FloatingLyricsSceneElement
+  | PlayerSceneElement
+  | SceneRendererElement;
 export type SceneConfig = {
   elements: SceneElement[];
 };
@@ -25,19 +36,24 @@ type SceneRendererProps = {
   kassida: Kassida;
   variantIndex: number;
   sceneConfig: SceneConfig;
+  row?: boolean;
+  padded?: boolean;
   onTrackListOpen: () => void;
 };
 
 const SceneRenderer = ({
   kassida,
   sceneConfig,
+  row,
+  padded,
   onTrackListOpen,
 }: SceneRendererProps) => {
   return (
     <View
       flex
       backgroundColor="white"
-      padding-10
+      padding-10={padded}
+      row={row}
       spread={sceneConfig.elements.length > 2 ? true : false}
       center={sceneConfig.elements.length <= 2 ? true : false}
       style={styles.sceneRenderer}>
@@ -64,12 +80,26 @@ const SceneRenderer = ({
             />
           );
         }
+
+        if (element.type === 'SCENE_RENDERER') {
+          return (
+            <SceneRenderer
+              key={element.key}
+              kassida={kassida}
+              variantIndex={0}
+              onTrackListOpen={onTrackListOpen}
+              {...element.props}
+            />
+          );
+        }
       })}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  sceneRenderer: {},
+  sceneRenderer: {
+    flexWrap: 'wrap',
+  },
 });
 export default SceneRenderer;
