@@ -1,4 +1,4 @@
-package com.kassaid;
+package com.kassaidapp;
 
 import com.facebook.react.ReactActivity;
 
