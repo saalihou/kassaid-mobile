@@ -1,11 +1,10 @@
-import React, {useMemo, useState, useEffect, useRef} from 'react';
-import {State, usePlaybackState, useProgress} from 'react-native-track-player';
+import React, {useMemo, useState, useEffect, useRef, useCallback} from 'react';
+import TrackPlayer, {Event, State} from 'react-native-track-player';
 import {StyleSheet, Platform, UIManager, Animated, Easing} from 'react-native';
 import {Card, Text, Colors, View} from 'react-native-ui-lib';
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import {ScrollView} from 'react-native-gesture-handler';
-import {sum} from 'lodash';
 export type FloatingLyricsProps = {
   kassida: Kassida;
   variantIndex: number;
@@ -32,14 +31,11 @@ const FloatingLyrics = ({
   langs = [],
 }: FloatingLyricsProps) => {
   const kassidaVariant = kassida.variants[variantIndex];
-  const progress = useProgress(1000);
-  const playbackState = usePlaybackState();
 
-  // const y = useRef(0);
   const scrollRef = useRef<ScrollView>(null);
   const scrollAnimation = useRef<Animated.Value>(new Animated.Value(0));
+  const currentScrollValueRef = useRef(0);
   const [contentHeight, setContentHeight] = useState(0);
-  const [scrollHeight, setScrollHeight] = useState(0);
   const segmentHeightsRef = useRef<number[]>([]);
 
   useEffect(() => {
@@ -65,48 +61,46 @@ const FloatingLyrics = ({
     });
   }, [kassida.content, langs]);
 
-  useEffect(() => {
-    if (playbackState === State.Playing) {
-      scrollAnimation.current.addListener(animation => {
-        scrollRef.current &&
-          scrollRef.current.scrollTo({
-            y: Math.max(animation.value, 0),
-            animated: false,
-          });
-      });
-
-      if (contentHeight && progress.duration) {
-        const currentSegmentIndex = Math.floor(
-          (progress.position / progress.duration) *
-            kassidaTextLinesByTwo[0].length,
-        );
-        const targetHeight = sum(
-          segmentHeightsRef.current.slice(
-            0,
-            Math.max(currentSegmentIndex - 1, 0),
-          ),
-        );
-        Animated.timing(scrollAnimation.current, {
-          toValue: targetHeight,
-          duration:
-            (progress.duration / kassidaTextLinesByTwo[0].length) * 1000,
-          useNativeDriver: true,
-          easing: Easing.linear,
-        }).start();
-      }
-    } else {
-      scrollAnimation.current.stopAnimation();
+  const startAutoScrolling = useCallback(async () => {
+    scrollAnimation.current.addListener(animation => {
+      currentScrollValueRef.current = animation.value;
+      scrollRef.current &&
+        scrollRef.current.scrollTo({
+          y: Math.max(animation.value, 0),
+          animated: false,
+        });
+    });
+    if (contentHeight) {
+      Animated.timing(scrollAnimation.current, {
+        toValue: contentHeight,
+        duration:
+          (await TrackPlayer.getDuration()) * 1000 -
+          (await TrackPlayer.getPosition()) * 1000,
+        useNativeDriver: true,
+        easing: Easing.linear,
+      }).start();
     }
-    const scrollAnimationCurrent = scrollAnimation.current;
-    return () => scrollAnimationCurrent.removeAllListeners();
-  }, [
-    contentHeight,
-    progress.duration,
-    progress.position,
-    scrollHeight,
-    kassidaTextLinesByTwo,
-    playbackState,
-  ]);
+  }, [contentHeight]);
+
+  const pauseAutoScrolling = useCallback(() => {
+    scrollAnimation.current.stopAnimation();
+    scrollRef.current?.scrollTo({
+      y: currentScrollValueRef.current,
+      animated: false,
+    });
+
+    scrollAnimation.current.removeAllListeners();
+  }, []);
+
+  useEffect(() => {
+    TrackPlayer.addEventListener(Event.PlaybackState, event => {
+      if (event.state === State.Playing) {
+        startAutoScrolling();
+      } else {
+        pauseAutoScrolling();
+      }
+    });
+  }, [startAutoScrolling, pauseAutoScrolling]);
 
   return (
     <Card
@@ -123,18 +117,12 @@ const FloatingLyrics = ({
         onContentSizeChange={(width, height) => {
           setContentHeight(height);
         }}
-        onLayout={event => {
-          setScrollHeight(event.nativeEvent.layout.height);
+        onScrollBeginDrag={() => {
+          pauseAutoScrolling();
         }}
-        onScrollBeginDrag={() => scrollAnimation.current.stopAnimation()}
         onScrollEndDrag={event => {
           scrollAnimation.current.setValue(event.nativeEvent.contentOffset.y);
-          Animated.timing(scrollAnimation.current, {
-            toValue: contentHeight,
-            duration: progress.duration * 1000 - progress.position * 1000,
-            useNativeDriver: true,
-            easing: Easing.linear,
-          }).start();
+          startAutoScrolling();
         }}
         style={styles.floatingLyrics}
         contentContainerStyle={styles.floatingLyricsContent}>
@@ -163,7 +151,7 @@ const FloatingLyrics = ({
             }}>
             {langs.map((lang, langIndex) => {
               return (
-                <View flex>
+                <View flex key={lang}>
                   <Text
                     center
                     text30
