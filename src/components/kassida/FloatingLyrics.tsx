@@ -153,6 +153,9 @@ const FloatingLyrics = ({
         contentContainerStyle={styles.floatingLyricsContent}>
         {kassidaTextLinesByTwo[0].map((line, lineIndex) => (
           <TouchableOpacity
+            onPressIn={() => {
+              pauseAutoScrolling();
+            }}
             onPress={() => {
               onLinesClick({
                 lineNumbers: [lineIndex * 2, lineIndex * 2 + 1],
