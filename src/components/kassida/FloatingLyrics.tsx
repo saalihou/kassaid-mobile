@@ -158,11 +158,11 @@ const FloatingLyrics = ({
                 lineNumbers: [lineIndex * 2, lineIndex * 2 + 1],
                 langs,
               });
-            }}>
+            }}
+            key={lineIndex}>
             <View
               row
               spread
-              key={lineIndex}
               style={
                 lineIndex % 2 === 0
                   ? styles.evenFloatingLyricsContent
