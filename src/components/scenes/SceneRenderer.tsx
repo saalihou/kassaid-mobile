@@ -10,7 +10,10 @@ export type SceneElementType = 'FLOATING_LYRICS' | 'PLAYER';
 type FloatingLyricsSceneElement = {
   key: string;
   type: 'FLOATING_LYRICS';
-  props?: Omit<FloatingLyricsProps, 'kassida' | 'variantIndex'>;
+  props?: Omit<
+    FloatingLyricsProps,
+    'kassida' | 'variantIndex' | 'onLinesClick'
+  >;
 };
 type PlayerSceneElement = {
   key: string;
@@ -22,7 +25,7 @@ type SceneRendererElement = {
   type: 'SCENE_RENDERER';
   props: Omit<
     SceneRendererProps,
-    'kassida' | 'variantIndex' | 'onTrackListOpen'
+    'kassida' | 'variantIndex' | 'onTrackListOpen' | 'onLinesClick'
   >;
 };
 type SceneElement =
@@ -39,6 +42,7 @@ type SceneRendererProps = {
   row?: boolean;
   padded?: boolean;
   onTrackListOpen: () => void;
+  onLinesClick: FloatingLyricsProps['onLinesClick'];
 };
 
 const SceneRenderer = ({
@@ -47,6 +51,7 @@ const SceneRenderer = ({
   row,
   padded,
   onTrackListOpen,
+  onLinesClick: onLinesLick,
 }: SceneRendererProps) => {
   return (
     <View
@@ -63,6 +68,7 @@ const SceneRenderer = ({
               key={element.key}
               kassida={kassida}
               variantIndex={0}
+              onLinesClick={onLinesLick}
               {...element.props}
             />
           );
@@ -87,6 +93,7 @@ const SceneRenderer = ({
               kassida={kassida}
               variantIndex={0}
               onTrackListOpen={onTrackListOpen}
+              onLinesClick={onLinesLick}
               {...element.props}
             />
           );

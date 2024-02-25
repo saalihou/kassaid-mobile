@@ -1,6 +1,13 @@
 import React, {useMemo, useState, useEffect, useRef, useCallback} from 'react';
 import TrackPlayer, {Event, State} from 'react-native-track-player';
-import {StyleSheet, Platform, UIManager, Animated, Easing} from 'react-native';
+import {
+  StyleSheet,
+  Platform,
+  UIManager,
+  Animated,
+  Easing,
+  TouchableOpacity,
+} from 'react-native';
 import {Card, Text, Colors, View} from 'react-native-ui-lib';
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
@@ -9,6 +16,7 @@ export type FloatingLyricsProps = {
   kassida: Kassida;
   variantIndex: number;
   langs?: Locale[];
+  onLinesClick: (payload: {lineNumbers: number[]; langs: Locale[]}) => void;
 };
 const fontSizePerLocale = {
   fr: 10,
@@ -29,6 +37,7 @@ const FloatingLyrics = ({
   kassida,
   variantIndex,
   langs = [],
+  onLinesClick,
 }: FloatingLyricsProps) => {
   const kassidaVariant = kassida.variants[variantIndex];
 
@@ -62,6 +71,10 @@ const FloatingLyrics = ({
   }, [kassida.content, langs]);
 
   const startAutoScrolling = useCallback(async () => {
+    if ((await TrackPlayer.getState()) !== State.Playing) {
+      return;
+    }
+    console.debug('startAutoScrolling');
     scrollAnimation.current.addListener(animation => {
       currentScrollValueRef.current = animation.value;
       scrollRef.current &&
@@ -84,12 +97,13 @@ const FloatingLyrics = ({
 
   const pauseAutoScrolling = useCallback(() => {
     scrollAnimation.current.stopAnimation();
-    scrollRef.current?.scrollTo({
-      y: currentScrollValueRef.current,
-      animated: false,
-    });
-
-    scrollAnimation.current.removeAllListeners();
+    if (scrollAnimation.current.hasListeners()) {
+      scrollAnimation.current.removeAllListeners();
+      scrollRef.current?.scrollTo({
+        y: currentScrollValueRef.current,
+        animated: false,
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -101,6 +115,17 @@ const FloatingLyrics = ({
       }
     });
   }, [startAutoScrolling, pauseAutoScrolling]);
+
+  useEffect(() => {
+    async function initScrollValues() {
+      scrollAnimation.current.setValue(
+        ((await TrackPlayer.getPosition()) * 1000) /
+          ((await TrackPlayer.getDuration()) * 1000),
+      );
+    }
+
+    initScrollValues();
+  }, [langs]);
 
   return (
     <Card
@@ -127,47 +152,55 @@ const FloatingLyrics = ({
         style={styles.floatingLyrics}
         contentContainerStyle={styles.floatingLyricsContent}>
         {kassidaTextLinesByTwo[0].map((line, lineIndex) => (
-          <View
-            row
-            spread
-            key={lineIndex}
-            style={
-              lineIndex % 2 === 0
-                ? styles.evenFloatingLyricsContent
-                : styles.oddFloatingLyricsContent
-            }
-            onLayout={event => {
-              // expand the array if needed to a length of index
-              if (segmentHeightsRef.current.length <= lineIndex) {
-                segmentHeightsRef.current = [
-                  ...segmentHeightsRef.current,
-                  ...new Array(
-                    lineIndex - segmentHeightsRef.current.length + 1,
-                  ),
-                ];
-              }
-              segmentHeightsRef.current[lineIndex] =
-                event.nativeEvent.layout.height;
+          <TouchableOpacity
+            onPress={() => {
+              onLinesClick({
+                lineNumbers: [lineIndex * 2, lineIndex * 2 + 1],
+                langs,
+              });
             }}>
-            {langs.map((lang, langIndex) => {
-              return (
-                <View flex key={lang}>
-                  <Text
-                    center
-                    text30
-                    style={[
-                      styles.lyricsContent,
-                      {
-                        fontSize: fontSizePerLocale[lang] || 16,
-                        lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
-                      },
-                    ]}>
-                    {kassidaTextLinesByTwo[langIndex][lineIndex]}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
+            <View
+              row
+              spread
+              key={lineIndex}
+              style={
+                lineIndex % 2 === 0
+                  ? styles.evenFloatingLyricsContent
+                  : styles.oddFloatingLyricsContent
+              }
+              onLayout={event => {
+                // expand the array if needed to a length of index
+                if (segmentHeightsRef.current.length <= lineIndex) {
+                  segmentHeightsRef.current = [
+                    ...segmentHeightsRef.current,
+                    ...new Array(
+                      lineIndex - segmentHeightsRef.current.length + 1,
+                    ),
+                  ];
+                }
+                segmentHeightsRef.current[lineIndex] =
+                  event.nativeEvent.layout.height;
+              }}>
+              {langs.map((lang, langIndex) => {
+                return (
+                  <View flex key={lang}>
+                    <Text
+                      center
+                      text30
+                      style={[
+                        styles.lyricsContent,
+                        {
+                          fontSize: fontSizePerLocale[lang] || 16,
+                          lineHeight: (fontSizePerLocale[lang] || 16) * 1.2,
+                        },
+                      ]}>
+                      {kassidaTextLinesByTwo[langIndex][lineIndex]}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          </TouchableOpacity>
         ))}
       </Animated.ScrollView>
     </Card>

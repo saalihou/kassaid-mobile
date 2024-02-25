@@ -9,7 +9,7 @@ type KassidaSelectorProps = {
 
 const KassidaSelector = ({kassidas, onSelect}: KassidaSelectorProps) => {
   return (
-    <Card padding>
+    <Card padding={10}>
       {kassidas.map(kassida => (
         <ListItem
           key={kassida.name.fr}

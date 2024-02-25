@@ -87,7 +87,7 @@ const Player = ({
         </Text>
         <View row style={styles.buttonsContainer}>
           <Button outline size={ButtonSize.xSmall} onPress={previous}>
-            <Icon name={'skip-previous'} size={16} color={Colors.primary} />
+            <Icon name={'skip-previous'} size={20} color={Colors.primary} />
           </Button>
           <Button onPress={playPause}>
             <Icon
@@ -117,6 +117,8 @@ const styles = StyleSheet.create({
   progressContainer: {
     alignSelf: 'stretch',
     alignItems: 'stretch',
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   buttonsContainer: {
     justifyContent: 'space-around',

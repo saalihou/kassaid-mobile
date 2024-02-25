@@ -1,11 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import TrackPlayer, {Capability, Event} from 'react-native-track-player';
 import View from 'react-native-ui-lib/view';
+
 import SceneRenderer from './src/components/scenes/SceneRenderer';
 import type {SceneConfig} from './src/components/scenes/SceneRenderer';
-import {Button, Colors, Dialog, SafeAreaSpacerView} from 'react-native-ui-lib';
+import {Button, Colors, Dialog} from 'react-native-ui-lib';
 import KassidaSelector from './src/components/kassida/KassidaSelector';
 import {Kassida} from './src/types/kassida/Kassida';
+import {SafeAreaView, StyleSheet} from 'react-native';
+import {Locale} from './src/types/common/Locale';
+import KassidaLineDetails from './src/components/kassida/KassidaLineDetails';
 type Scene = {
   key: string;
   name: string;
@@ -156,6 +160,10 @@ const App = () => {
   const [selectedScene, setSelectedScene] = useState(scenes[0]);
   const [kassidaSelectorOpen, setKassidaSelectorOpen] = useState(false);
   const [selectedKassida, setSelectedKassida] = useState(kassidas[0]);
+  const [lineDetailsOpen, setLineDetailsOpen] = useState(false);
+  const [selectedLineNumbers, setSelectedLineNumbers] = useState<number[]>([]);
+  const [selectedLangs, setSelectedLangs] = useState<Locale[]>([]);
+
   useEffect(() => {
     async function skipToTrack() {
       const index = kassidas.indexOf(selectedKassida);
@@ -179,43 +187,63 @@ const App = () => {
     });
   }, []);
   return (
-    <View flex>
-      <SafeAreaSpacerView />
-      <View row center padding-10 backgroundColor={Colors.white}>
-        {scenes.map(scene => (
-          <Button
-            key={scene.key}
-            onPress={() => {
-              setSelectedScene(scene);
+    <SafeAreaView style={styles.safeAreaView}>
+      <View flex padding-5>
+        <View row center padding-10 backgroundColor={Colors.white}>
+          {scenes.map(scene => (
+            <Button
+              key={scene.key}
+              onPress={() => {
+                setSelectedScene(scene);
+              }}
+              label={scene.name}
+              backgroundColor={
+                selectedScene === scene ? Colors.primary : Colors.white
+              }
+              color={selectedScene === scene ? Colors.white : Colors.primary}
+            />
+          ))}
+        </View>
+        <Dialog
+          visible={kassidaSelectorOpen}
+          onDismiss={() => setKassidaSelectorOpen(false)}>
+          <KassidaSelector
+            kassidas={kassidas}
+            onSelect={kassida => {
+              setSelectedKassida(kassida);
+              setKassidaSelectorOpen(false);
             }}
-            label={scene.name}
-            backgroundColor={
-              selectedScene === scene ? Colors.primary : Colors.white
-            }
-            color={selectedScene === scene ? Colors.white : Colors.primary}
           />
-        ))}
-      </View>
-      <Dialog
-        visible={kassidaSelectorOpen}
-        onDismiss={() => setKassidaSelectorOpen(false)}>
-        <KassidaSelector
-          kassidas={kassidas}
-          onSelect={kassida => {
-            setSelectedKassida(kassida);
-            setKassidaSelectorOpen(false);
+        </Dialog>
+        <Dialog
+          visible={lineDetailsOpen}
+          onDismiss={() => setLineDetailsOpen(false)}>
+          <KassidaLineDetails
+            kassida={selectedKassida}
+            lineNumbers={selectedLineNumbers}
+            langs={selectedLangs}
+          />
+        </Dialog>
+        <SceneRenderer
+          kassida={selectedKassida}
+          variantIndex={0}
+          sceneConfig={selectedScene.config}
+          onTrackListOpen={() => setKassidaSelectorOpen(true)}
+          onLinesClick={({lineNumbers, langs}) => {
+            setSelectedLineNumbers(lineNumbers);
+            setSelectedLangs(langs);
+            setLineDetailsOpen(true);
           }}
         />
-      </Dialog>
-      <SceneRenderer
-        kassida={selectedKassida}
-        variantIndex={0}
-        sceneConfig={selectedScene.config}
-        onTrackListOpen={() => setKassidaSelectorOpen(true)}
-      />
-      <SafeAreaSpacerView />
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeAreaView: {
+    flex: 1,
+  },
+});
 
 export default App;
