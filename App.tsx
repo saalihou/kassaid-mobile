@@ -10,6 +10,7 @@ import {Kassida} from './src/types/kassida/Kassida';
 import {SafeAreaView, StyleSheet} from 'react-native';
 import {Locale} from './src/types/common/Locale';
 import KassidaLineDetails from './src/components/kassida/KassidaLineDetails';
+import KassidaPicker from './src/components/kassida/KassidaPicker';
 type Scene = {
   key: string;
   name: string;
@@ -133,13 +134,15 @@ const kassidas: Kassida[] = [
   require('./src/fixtures/matlabouchifai.json'),
   require('./src/fixtures/madalkhabirou.json'),
 ];
-const tracks = kassidas.map(kassida => ({
-  url: kassida.variants[0].audio.url,
-  title: kassida.name.fr,
-  artist: 'Cheikh Ahmadou Bamba',
-  artwork: kassida.variants[0].preview.url,
-  duration: kassida.variants[0].duration, // Duration in seconds
-}));
+const tracks = kassidas.flatMap(kassida =>
+  kassida.variants.map(variant => ({
+    url: variant.audio.url,
+    title: kassida.name.fr,
+    artist: 'Cheikh Ahmadou Bamba',
+    artwork: variant.preview.url,
+    duration: variant.duration, // Duration in seconds
+  })),
+);
 TrackPlayer.setupPlayer({})
   .then(() => {
     TrackPlayer.add(tracks);
@@ -166,7 +169,9 @@ const App = () => {
 
   useEffect(() => {
     async function skipToTrack() {
-      const index = kassidas.indexOf(selectedKassida);
+      const index = tracks.findIndex(
+        track => track.url === selectedKassida.variants[0].audio.url,
+      );
 
       if ((await TrackPlayer.getCurrentTrack()) !== index) {
         TrackPlayer.skip(index);
@@ -188,6 +193,13 @@ const App = () => {
   }, []);
   return (
     <SafeAreaView style={styles.safeAreaView}>
+      <View paddingH-5 paddingT-10>
+        <KassidaPicker
+          kassidas={kassidas}
+          value={selectedKassida}
+          onChange={kassida => setSelectedKassida(kassida)}
+        />
+      </View>
       <View flex padding-5>
         <View row center padding-10 backgroundColor={Colors.white}>
           {scenes.map(scene => (
@@ -228,7 +240,6 @@ const App = () => {
           kassida={selectedKassida}
           variantIndex={0}
           sceneConfig={selectedScene.config}
-          onTrackListOpen={() => setKassidaSelectorOpen(true)}
           onLinesClick={({lineNumbers, langs}) => {
             setSelectedLineNumbers(lineNumbers);
             setSelectedLangs(langs);

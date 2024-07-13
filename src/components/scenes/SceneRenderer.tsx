@@ -41,7 +41,6 @@ type SceneRendererProps = {
   sceneConfig: SceneConfig;
   row?: boolean;
   padded?: boolean;
-  onTrackListOpen: () => void;
   onLinesClick: FloatingLyricsProps['onLinesClick'];
 };
 
@@ -50,7 +49,6 @@ const SceneRenderer = ({
   sceneConfig,
   row,
   padded,
-  onTrackListOpen,
   onLinesClick: onLinesLick,
 }: SceneRendererProps) => {
   return (
@@ -80,7 +78,6 @@ const SceneRenderer = ({
               key={element.key}
               kassida={kassida}
               variantIndex={0}
-              onNamePress={onTrackListOpen}
               {...element.props}
             />
           );
@@ -92,7 +89,6 @@ const SceneRenderer = ({
               key={element.key}
               kassida={kassida}
               variantIndex={0}
-              onTrackListOpen={onTrackListOpen}
               onLinesClick={onLinesLick}
               {...element.props}
             />
