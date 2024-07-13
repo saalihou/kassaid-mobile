@@ -18,7 +18,10 @@ type FloatingLyricsSceneElement = {
 type PlayerSceneElement = {
   key: string;
   type: 'PLAYER';
-  props?: Omit<PlayerProps, 'kassida' | 'variantIndex' | 'onNamePress'>;
+  props?: Omit<
+    PlayerProps,
+    'kassida' | 'variantIndex' | 'onNamePress' | 'onVariantListOpen'
+  >;
 };
 type SceneRendererElement = {
   key: string;
@@ -42,14 +45,17 @@ type SceneRendererProps = {
   row?: boolean;
   padded?: boolean;
   onLinesClick: FloatingLyricsProps['onLinesClick'];
+  onVariantListOpen?: PlayerProps['onVariantListOpen'];
 };
 
 const SceneRenderer = ({
   kassida,
+  variantIndex,
   sceneConfig,
   row,
   padded,
   onLinesClick: onLinesLick,
+  onVariantListOpen,
 }: SceneRendererProps) => {
   return (
     <View
@@ -65,7 +71,7 @@ const SceneRenderer = ({
             <FloatingLyrics
               key={element.key}
               kassida={kassida}
-              variantIndex={0}
+              variantIndex={variantIndex}
               onLinesClick={onLinesLick}
               {...element.props}
             />
@@ -77,7 +83,8 @@ const SceneRenderer = ({
             <Player
               key={element.key}
               kassida={kassida}
-              variantIndex={0}
+              variantIndex={variantIndex}
+              onVariantListOpen={onVariantListOpen}
               {...element.props}
             />
           );
@@ -88,7 +95,7 @@ const SceneRenderer = ({
             <SceneRenderer
               key={element.key}
               kassida={kassida}
-              variantIndex={0}
+              variantIndex={variantIndex}
               onLinesClick={onLinesLick}
               {...element.props}
             />

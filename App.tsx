@@ -11,6 +11,7 @@ import {SafeAreaView, StyleSheet} from 'react-native';
 import {Locale} from './src/types/common/Locale';
 import KassidaLineDetails from './src/components/kassida/KassidaLineDetails';
 import KassidaPicker from './src/components/kassida/KassidaPicker';
+import KassidaVariantSelector from './src/components/kassida/KassidaVariantSelector';
 type Scene = {
   key: string;
   name: string;
@@ -162,7 +163,11 @@ TrackPlayer.updateOptions({
 const App = () => {
   const [selectedScene, setSelectedScene] = useState(scenes[0]);
   const [kassidaSelectorOpen, setKassidaSelectorOpen] = useState(false);
+  const [variantSelectorOpen, setVariantSelectorOpen] = useState(false);
   const [selectedKassida, setSelectedKassida] = useState(kassidas[0]);
+  const [selectedVariant, setSelectedVariant] = useState(
+    kassidas[0].variants[0],
+  );
   const [lineDetailsOpen, setLineDetailsOpen] = useState(false);
   const [selectedLineNumbers, setSelectedLineNumbers] = useState<number[]>([]);
   const [selectedLangs, setSelectedLangs] = useState<Locale[]>([]);
@@ -170,16 +175,26 @@ const App = () => {
   useEffect(() => {
     async function skipToTrack() {
       const index = tracks.findIndex(
-        track => track.url === selectedKassida.variants[0].audio.url,
+        track =>
+          track.title === selectedKassida.name.fr &&
+          track.url === selectedVariant.audio.url,
+      );
+
+      console.log(
+        selectedKassida.name.fr,
+        selectedVariant.name.fr,
+        tracks.map(track => `${track.title} - ${track.url}`),
+        index,
       );
 
       if ((await TrackPlayer.getCurrentTrack()) !== index) {
+        console.debug('skipToTrack', index);
         TrackPlayer.skip(index);
       }
     }
 
     skipToTrack();
-  }, [selectedKassida]);
+  }, [selectedKassida, selectedVariant]);
   useEffect(() => {
     TrackPlayer.addEventListener(Event.PlaybackTrackChanged, data => {
       const nextTrack = data.nextTrack;
@@ -188,16 +203,37 @@ const App = () => {
         return;
       }
 
-      setSelectedKassida(kassidas[nextTrack]);
+      const kassida = kassidas.find(k =>
+        k.variants.some(v => v.audio.url === tracks[nextTrack].url),
+      );
+      const variant = kassida?.variants.find(
+        v => v.audio.url === tracks[nextTrack].url,
+      );
+
+      if (!kassida || !variant) {
+        return;
+      }
+
+      console.log('onPlaybackTrackChanged', kassida.name.fr, variant.name.fr);
+      setSelectedKassida(kassida);
+      setSelectedVariant(variant);
     });
   }, []);
+
+  const variantIndex =
+    selectedKassida.variants.indexOf(selectedVariant) === -1
+      ? 0
+      : selectedKassida.variants.indexOf(selectedVariant);
   return (
     <SafeAreaView style={styles.safeAreaView}>
       <View paddingH-5 paddingT-10>
         <KassidaPicker
           kassidas={kassidas}
           value={selectedKassida}
-          onChange={kassida => setSelectedKassida(kassida)}
+          onChange={kassida => {
+            setSelectedKassida(kassida);
+            setSelectedVariant(kassida.variants[0]);
+          }}
         />
       </View>
       <View flex padding-5>
@@ -223,7 +259,19 @@ const App = () => {
             kassidas={kassidas}
             onSelect={kassida => {
               setSelectedKassida(kassida);
+              setSelectedVariant(kassida.variants[0]);
               setKassidaSelectorOpen(false);
+            }}
+          />
+        </Dialog>
+        <Dialog
+          visible={variantSelectorOpen}
+          onDismiss={() => setVariantSelectorOpen(false)}>
+          <KassidaVariantSelector
+            kassida={selectedKassida}
+            onSelect={variant => {
+              setSelectedVariant(variant);
+              setVariantSelectorOpen(false);
             }}
           />
         </Dialog>
@@ -238,8 +286,12 @@ const App = () => {
         </Dialog>
         <SceneRenderer
           kassida={selectedKassida}
-          variantIndex={0}
+          variantIndex={variantIndex}
           sceneConfig={selectedScene.config}
+          onVariantListOpen={() => {
+            setVariantSelectorOpen(true);
+            console.log('onVariantListOpen');
+          }}
           onLinesClick={({lineNumbers, langs}) => {
             setSelectedLineNumbers(lineNumbers);
             setSelectedLangs(langs);

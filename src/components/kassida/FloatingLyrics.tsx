@@ -48,14 +48,16 @@ const FloatingLyrics = ({
   const segmentHeightsRef = useRef<number[]>([]);
 
   useEffect(() => {
-    const startDelayPercentage =
-      (kassidaVariant.transcriptionStartDelay || 0) / kassidaVariant.duration;
+    const startDelayPercentage = kassidaVariant.transcriptionStartDelay
+      ? (kassidaVariant.transcriptionStartDelay || 0) / kassidaVariant.duration
+      : 0.1;
     const startDelayOffset = startDelayPercentage * contentHeight;
     scrollAnimation.current.setValue(-startDelayOffset);
   }, [
     kassidaVariant.transcriptionStartDelay,
     kassidaVariant.duration,
     contentHeight,
+    variantIndex,
   ]);
 
   const kassidaTextLinesByTwo = useMemo(() => {

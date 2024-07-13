@@ -8,13 +8,19 @@ import TrackPlayer, {State} from 'react-native-track-player';
 import type {Kassida} from '../../types/kassida/Kassida';
 import type {Locale} from '../../types/common/Locale';
 import PlayerProgress from './PlayerProgress';
-import {Button, ButtonSize, Colors} from 'react-native-ui-lib';
+import {
+  Button,
+  ButtonSize,
+  Colors,
+  TouchableOpacity,
+} from 'react-native-ui-lib';
 export type PlayerProps = {
   kassida: Kassida;
   variantIndex: number;
   lang?: Locale;
   onPlay?: () => void;
   onPause?: () => void;
+  onVariantListOpen?: () => void;
 };
 
 const Player = ({
@@ -23,6 +29,7 @@ const Player = ({
   lang = 'fr',
   onPause,
   onPlay,
+  onVariantListOpen,
 }: PlayerProps) => {
   const variant = kassida.variants[variantIndex];
   const [isPlaying, setIsPlaying] = useState(false);
@@ -67,7 +74,7 @@ const Player = ({
   }, []);
   return (
     <Card row>
-      <View>
+      <TouchableOpacity onPress={onVariantListOpen}>
         <Card.Section
           imageSource={{
             uri: variant.preview.url,
@@ -77,7 +84,7 @@ const Player = ({
         <Text center text90T>
           {variant.name[lang]}
         </Text>
-      </View>
+      </TouchableOpacity>
       <View centerH flex spread paddingV-5>
         <View row style={styles.buttonsContainer}>
           <Button

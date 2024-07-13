@@ -21,7 +21,6 @@
         "url": "https://lequotidien.sn/wp-content/uploads/2020/01/Cheikh-Ahmadou-Bamba.jpg"
       },
       "duration": 561,
-      "transcriptionStartDelay": 25,
       "transcriptionSegments": {
         "fr": [
           {
@@ -2232,6 +2231,18 @@
           }
         ]
       }
+    },
+    {
+      "name": {
+        "fr": "S Abdou Diouf"
+      },
+      "audio": {
+        "url": "https://kassaid-assets.fra1.digitaloceanspaces.com/matlabou-chifai/s-abdou-diouf.mp3"
+      },
+      "preview": {
+        "url": "https://kassaid-assets.fra1.digitaloceanspaces.com/matlabou-chifai/s-abdou-diouf.jpg"
+      },
+      "duration": 492
     }
   ]
 }
