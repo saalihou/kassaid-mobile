@@ -96,6 +96,7 @@ const FloatingLyrics = ({
   }, [contentHeight]);
 
   const pauseAutoScrolling = useCallback(() => {
+    console.debug('pauseAutoScrolling');
     scrollAnimation.current.stopAnimation();
     if (scrollAnimation.current.hasListeners()) {
       scrollAnimation.current.removeAllListeners();
@@ -127,6 +128,8 @@ const FloatingLyrics = ({
     initScrollValues();
   }, [langs]);
 
+  const isMomentumScrolling = useRef(false);
+
   return (
     <Card
       enableShadow
@@ -145,7 +148,25 @@ const FloatingLyrics = ({
         onScrollBeginDrag={() => {
           pauseAutoScrolling();
         }}
+        onMomentumScrollBegin={() => {
+          console.debug('onMomentumScrollBegin');
+          isMomentumScrolling.current = true;
+          pauseAutoScrolling();
+        }}
         onScrollEndDrag={event => {
+          const nativeEvent = event.nativeEvent;
+          setTimeout(() => {
+            console.debug('onScrollEndDrag', isMomentumScrolling.current);
+            if (isMomentumScrolling.current) {
+              return;
+            }
+            scrollAnimation.current.setValue(nativeEvent.contentOffset.y);
+            startAutoScrolling();
+          }, 10);
+        }}
+        onMomentumScrollEnd={event => {
+          console.debug('onMomentumScrollEnd');
+          isMomentumScrolling.current = false;
           scrollAnimation.current.setValue(event.nativeEvent.contentOffset.y);
           startAutoScrolling();
         }}
