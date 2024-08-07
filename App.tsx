@@ -134,6 +134,7 @@ const scenes: Scene[] = [
 const kassidas: Kassida[] = [
   require('./src/fixtures/matlabouchifai.json'),
   require('./src/fixtures/madalkhabirou.json'),
+  require('./src/fixtures/jaawartou.json'),
 ];
 const tracks = kassidas.flatMap(kassida =>
   kassida.variants.map(variant => ({
@@ -141,7 +142,7 @@ const tracks = kassidas.flatMap(kassida =>
     title: kassida.name.fr,
     artist: 'Cheikh Ahmadou Bamba',
     artwork: variant.preview.url,
-    duration: variant.duration, // Duration in seconds
+    // duration: parseInt(String(variant.duration), 10), // Duration in seconds
   })),
 );
 TrackPlayer.setupPlayer({})

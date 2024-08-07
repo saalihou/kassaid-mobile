@@ -74,14 +74,16 @@ const Player = ({
   }, []);
   return (
     <Card row>
-      <TouchableOpacity onPress={onVariantListOpen}>
+      <TouchableOpacity
+        onPress={onVariantListOpen}
+        style={styles.cardImageContainer}>
         <Card.Section
           imageSource={{
             uri: variant.preview.url,
           }}
           imageStyle={styles.cardImage}
         />
-        <Text center text90T>
+        <Text center text90T numberOfLines={2}>
           {variant.name[lang]}
         </Text>
       </TouchableOpacity>
@@ -124,6 +126,9 @@ const Player = ({
 };
 
 const styles = StyleSheet.create({
+  cardImageContainer: {
+    width: 100,
+  },
   cardImage: {
     width: 100,
     height: 100,

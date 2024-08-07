@@ -1,4 +1,5 @@
 import React from 'react';
+import {StyleSheet} from 'react-native';
 import {Card, GridList, GridListItem, Spacings} from 'react-native-ui-lib';
 import type {Kassida} from '../../types/kassida/Kassida';
 type KassidaVariantSelectorProps = {
@@ -20,21 +21,29 @@ const KassidaVariantSelector = ({
           resizeMode: 'cover',
         }}
         title={item.name.fr}
+        titleLines={2}
         onPress={() => onSelect(item)}
       />
     );
   };
   return (
-    <Card padding={10}>
+    <Card>
       <GridList
         data={kassida.variants}
         renderItem={renderItem}
         numColumns={2}
+        contentContainerStyle={styles.contentContainer}
         itemSpacing={Spacings.s3}
         listPadding={Spacings.s5}
       />
     </Card>
   );
 };
+
+const styles = StyleSheet.create({
+  contentContainer: {
+    alignItems: 'center',
+  },
+});
 
 export default KassidaVariantSelector;
