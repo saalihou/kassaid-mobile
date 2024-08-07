@@ -570,6 +570,7 @@
 				DEVELOPMENT_TEAM = L765N7Y286;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = kassaid/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
@@ -600,6 +601,7 @@
 				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = L765N7Y286;
 				INFOPLIST_FILE = kassaid/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(SDKROOT)/usr/lib/swift",
 					"$(inherited)",
